@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Sales Tracker PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* Base Mobile-First Styles */
+        :root {
+            --primary-color: #4CAF50;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --grid-color: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --nav-height: 60px;
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --grid-color: #404040;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            overflow-x: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Container Adjustments */
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 16px;
+            margin: 0 auto;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            height: calc(100vh - var(--nav-height) - var(--safe-area-bottom));
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: var(--safe-area-bottom);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: calc(64px + var(--safe-area-bottom));
+            background-color: var(--card-bg);
+            box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: var(--safe-area-bottom);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .nav-item {
+            flex: 1;
+            height: 64px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            text-decoration: none;
+            position: relative;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            gap: 4px;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        .nav-item.active::after {
+            width: 32px;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+            transform: scale(1);
+            transition: transform 0.2s ease;
+        }
+
+        .nav-text {
+            font-size: 12px;
+            font-weight: 500;
+            transform: translateY(0);
+            transition: transform 0.2s ease;
+        }
+
+        /* Active and Hover States */
+        .nav-item:active .nav-icon {
+            transform: scale(0.9);
+        }
+
+        .nav-item:active .nav-text {
+            transform: translateY(2px);
+        }
+
+        /* Touch Ripple Effect */
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .nav-item:active::before {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.1;
+        }
+
+        /* Media Queries for Different Screen Sizes */
+        @media (min-width: 768px) {
+            .nav-bar {
+                max-width: 500px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 20px 20px 0 0;
+                margin-bottom: var(--safe-area-bottom);
+            }
+
+            .nav-text {
+                font-size: 14px;
+            }
+        }
+
+        /* Dark Mode Adjustments */
+        [data-theme="dark"] .nav-bar {
+            background-color: rgba(45, 45, 45, 0.95);
+        }
+
+        /* Form Elements */
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .sale-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--grid-color);
+            border-radius: 8px;
+            font-size: 16px; /* Prevent zoom on iOS */
+        }
+
+        /* Cards */
+        .sales-card, .chart-card {
+            border-radius: 16px;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .chart-card {
+            aspect-ratio: 16/9;
+            max-height: 300px;
+        }
+
+        /* Media Queries */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 768px;
+                padding: 24px;
+            }
+
+            .nav-item {
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1024px;
+            }
+        }
+
+        /* iOS Specific */
+        @supports (-webkit-touch-callout: none) {
+            .tab-content {
+                height: -webkit-fill-available;
+            }
+        }
+
+        /* Prevent pull-to-refresh */
+        body {
+            overscroll-behavior-y: contain;
+        }
+
+        /* Touch-friendly buttons */
+        button {
+            min-height: 44px; /* iOS minimum touch target size */
+            font-size: 16px;
+        }
+
+        /* Improved scrolling */
+        .tab-content {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Status bar background on iOS */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            body {
+                padding-top: env(safe-area-inset-top);
+            }
+        }
+
+        :root[data-theme="light"] {
+            --hover-color: #45a049;
+        }
+
+        :root[data-theme="dark"] {
+            --hover-color: #45a049;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+        
+        #salesCounter {
+            font-size: 3.5em;
+            color: var(--primary-color);
+            margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #addSaleBtn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+        
+        #addSaleBtn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #addSaleBtn:active {
+            transform: translateY(0);
+        }
+        
+        .chart-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--card-bg);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            color: var(--text-color);
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        /* Enhanced mobile styles */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                width: 95%;
+                margin-bottom: 15px;
+            }
+
+            .chart-container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            h1 {
+                font-size: 1.6em;
+                margin-bottom: 15px;
+            }
+
+            #salesCounter {
+                font-size: 2.5em;
+                margin: 15px 0;
+            }
+
+            #addSaleBtn {
+                padding: 15px 30px;
+                font-size: 1.2em;
+                width: 80%;
+                max-width: 300px;
+                /* Increase touch target size */
+                min-height: 44px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                /* Increase touch target size */
+                padding: 12px;
+                font-size: 1.4em;
+            }
+
+            /* Prevent text selection on buttons */
+            button {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            /* Improve chart responsiveness */
+            canvas {
+                max-height: 300px;
+            }
+        }
+
+        /* Add iPad/tablet specific adjustments */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .container {
+                width: 85%;
+            }
+
+            .chart-container {
+                width: 85%;
+            }
+
+            #addSaleBtn {
+                padding: 18px 36px;
+                font-size: 1.3em;
+            }
+        }
+
+        /* Add touch-friendly hover states */
+        @media (hover: none) {
+            #addSaleBtn:hover {
+                transform: none;
+                box-shadow: var(--shadow);
+            }
+
+            .theme-toggle:hover {
+                transform: none;
+            }
+        }
+
+        /* Achievement styles */
+        .achievement {
+            background-color: var(--card-bg);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .achievement:hover {
+            transform: translateY(-2px);
+        }
+
+        .achievement-icon {
+            font-size: 2em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            border-radius: 50%;
+        }
+
+        .achievement-info {
+            flex: 1;
+        }
+
+        .achievement-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .achievement-progress {
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        /* Reminder styles */
+        .reminder-form {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .reminder-input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--grid-color);
+            border-radius: 8px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .reminder-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        /* Reminder styles update */
+        .reminder-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .reminder-button.secondary {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .active-reminders {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .active-reminders h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .reminder-item {
+            background-color: var(--bg-color);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Updated Notification styles */
+        .notification {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+            width: 100%;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 8px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        #notificationsList {
+            margin: 20px auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sale Form Styles */
+        .sale-form {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .name-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .unknown-btn {
+            padding: 0 15px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--grid-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .unknown-btn:hover {
+            background-color: var(--grid-color);
+        }
+
+        .sale-submit-btn {
+            position: relative;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .sale-submit-btn:disabled {
+            background-color: var(--grid-color);
+            cursor: not-allowed;
+        }
+
+        /* Snake-like progress bar */
+        .sale-submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(var(--progress, 100%));
+            transition: transform 1s linear;
+        }
+
+        .cooldown-timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+
+        .sale-submit-btn:disabled .cooldown-timer {
+            opacity: 1;
+        }
+
+        .sale-submit-btn:disabled .btn-text {
+            opacity: 0;
+        }
+
+        .btn-text {
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes slideProgress {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* Success Animation Styles */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .success-overlay.visible {
+            display: flex;
+        }
+
+        .success-popup {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transform: scale(0);
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 90%;
+            width: 300px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .success-popup.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: inline-block;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+        }
+
+        .success-message {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .sale-details {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        /* Coming Soon Section Styles */
+        .coming-soon-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .coming-soon-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .coming-soon-header h2 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .new-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        .feature-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+        }
+
+        .feature-icon {
+            font-size: 1.2em;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* Home Screen Styles */
+        .home-background {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            min-height: calc(100vh - 60px); /* Account for bottom nav */
+            position: relative;
+            overflow: hidden;
+            padding: 20px 0;
+        }
+
+        /* Animated Background Elements */
+        .animated-circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .circle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        .circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            left: -150px;
+            top: -150px;
+            animation-delay: 0s;
+        }
+
+        .circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            right: -100px;
+            top: 30%;
+            animation-delay: -5s;
+        }
+
+        .circle:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            left: 20%;
+            bottom: -75px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, 30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        /* Sales Card Styles */
+        .sales-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .sales-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .sales-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.5em;
+        }
+
+        .dollar-sign {
+            font-size: 2em;
+            color: #4CAF50;
+            font-weight: bold;
+            animation: bounce 2s infinite;
+        }
+
+        .sales-amount {
+            font-size: 3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .sales-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .trend-icon {
+            font-size: 1.2em;
+            animation: slideUp 1s infinite alternate;
+        }
+
+        /* Chart Card Styles */
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+            height: 300px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(3px); }
+            to { transform: translateY(-3px); }
+        }
+
+        /* Container adjustments */
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Dark theme adjustments */
+        [data-theme="dark"] .sales-card,
+        [data-theme="dark"] .chart-card {
+            background: var(--card-bg);
+        }
+
+        [data-theme="dark"] .sales-header h2,
+        [data-theme="dark"] .sales-amount {
+            color: var(--text-color);
+        }
+
+        /* Recent Sales Styles */
+        .recent-sales-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .recent-sales-card h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 1.2em;
+        }
+
+        .recent-sales-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sale-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .sale-item:hover {
+            transform: translateX(5px);
+        }
+
+        .sale-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .customer-name {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .sale-date {
+            font-size: 0.8em;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .sale-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Dark theme adjustments */
+        [data-theme="dark"] .recent-sales-card {
+            background: var(--card-bg);
+        }
+
+        [data-theme="dark"] .recent-sales-card h3 {
+            color: var(--text-color);
+        }
+
+        [data-theme="dark"] .sale-item {
+            background: rgba(76, 175, 80, 0.05);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    
+    <!-- Home Screen Tab -->
+    <div id="home" class="tab-content active">
+        <div class="home-background">
+            <div class="animated-circles">
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+            </div>
+            
+            <div class="container">
+                <div class="sales-card">
+                    <div class="sales-header">
+                        <h2>Total Sales</h2>
+                        <div class="dollar-sign">$</div>
+                    </div>
+                    <div id="salesCounter" class="sales-amount">0</div>
+                    <div class="sales-trend">
+                        <span class="trend-icon">📈</span>
+                        <span class="trend-text">Growing Strong!</span>
+                    </div>
+                </div>
+
+                <!-- Recent Sales List -->
+                <div class="recent-sales-card">
+                    <h3>Recent Sales</h3>
+                    <div id="recentSalesList" class="recent-sales-list">
+                        <!-- Sales will be added here dynamically -->
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Sales Tab -->
+    <div id="add-sales" class="tab-content">
+        <div class="container">
+            <h1>Add Sale</h1>
+            <form id="saleForm" onsubmit="handleSaleSubmit(event)">
+                <div class="input-group">
+                    <label for="customerName">Customer Name</label>
+                    <div class="name-input-group">
+                        <input type="text" id="customerName" class="sale-input" placeholder="Enter customer name">
+                        <button type="button" class="unknown-btn" onclick="setUnknownCustomer()">Unknown</button>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="saleDate">Date of Sale</label>
+                    <input type="datetime-local" id="saleDate" class="sale-input" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="saleAmount">Amount ($)</label>
+                    <input type="number" id="saleAmount" class="sale-input" value="7" min="0" step="0.01" required>
+                </div>
+                
+                <button type="submit" id="submitSaleBtn" class="sale-submit-btn">
+                    <span class="btn-text">Confirm Sale</span>
+                    <span class="cooldown-timer"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Animation Overlay -->
+    <div class="success-overlay">
+        <div class="success-popup">
+            <div class="success-icon">✓</div>
+            <div class="success-message">Sale Added Successfully!</div>
+            <div class="sale-details"></div>
+        </div>
+    </div>
+
+    <!-- Reminders Tab -->
+    <div id="reminders" class="tab-content">
+        <div class="container">
+            <h1>Reminders</h1>
+            <form class="reminder-form" onsubmit="handleReminderSubmit(event)">
+                <input type="text" id="reminderTitle" class="reminder-input" placeholder="Reminder title" required>
+                <input type="number" id="reminderGoal" class="reminder-input" placeholder="Sales goal" required>
+                <input type="datetime-local" id="reminderTime" class="reminder-input" required>
+                <div class="reminder-buttons">
+                    <button type="submit" class="reminder-button">Set Reminder</button>
+                    <button type="button" class="reminder-button secondary" onclick="showReminderNow()">Show Now</button>
+                </div>
+            </form>
+            
+            <!-- Active Reminders List -->
+            <div class="active-reminders">
+                <h2>Active Reminders</h2>
+                <div id="remindersList"></div>
+            </div>
+
+            <!-- Notifications will appear here -->
+            <div id="notificationsList" style="width: 90%; max-width: 500px;"></div>
+        </div>
+    </div>
+
+    <!-- Achievements Tab -->
+    <div id="achievements" class="tab-content">
+        <div class="container">
+            <h1>Achievements</h1>
+            <div id="achievementsList">
+                <div class="achievement">
+                    <div class="achievement-icon">🌟</div>
+                    <div class="achievement-info">
+                        <div class="achievement-title">First Sale</div>
+                        <div class="achievement-progress" id="firstSaleProgress">Not Started</div>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <div class="achievement-icon">💎</div>
+                    <div class="achievement-info">
+                        <div class="achievement-title">$100 in Sales</div>
+                        <div class="achievement-progress" id="sales100Progress">$0/100</div>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <div class="achievement-icon">🏆</div>
+                    <div class="achievement-info">
+                        <div class="achievement-title">7-Day Streak</div>
+                        <div class="achievement-progress" id="streakProgress">0/7 days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coming Soon Section -->
+            <div class="coming-soon-section">
+                <div class="coming-soon-header">
+                    <h2>Coming Soon! 🚀</h2>
+                    <span class="new-badge">NEW</span>
+                </div>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <span>Monthly Sales Goals</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📈</span>
+                        <span>Performance Analytics</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🏅</span>
+                        <span>Custom Badges</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+        <a href="#home" class="nav-item active" onclick="switchTab('home')">
+            <div class="nav-icon">🏠</div>
+            <span class="nav-text">Home</span>
+        </a>
+        <a href="#add-sales" class="nav-item" onclick="switchTab('add-sales')">
+            <div class="nav-icon">💰</div>
+            <span class="nav-text">Add Sale</span>
+        </a>
+        <a href="#reminders" class="nav-item" onclick="switchTab('reminders')">
+            <div class="nav-icon">⏰</div>
+            <span class="nav-text">Reminders</span>
+        </a>
+        <a href="#achievements" class="nav-item" onclick="switchTab('achievements')">
+            <div class="nav-icon">🏆</div>
+            <span class="nav-text">Goals</span>
+        </a>
+    </nav>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update chart colors if chart exists
+            if (typeof salesChart !== 'undefined') {
+                salesChart.options.scales.x.grid.color = getComputedStyle(document.body).getPropertyValue('--grid-color');
+                salesChart.options.scales.y.grid.color = getComputedStyle(document.body).getPropertyValue('--grid-color');
+                salesChart.update();
+            }
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Initialize sales total and daily tracking
+        let salesTotal = 0;
+        const SALE_AMOUNT = 7;
+        const DAYS_TO_TRACK = 14;
+        
+        // Initialize chart data arrays
+        let chartLabels = [];
+        let chartData = [];
+        
+        // Function to get today's date in readable format
+        function getFormattedDate() {
+            const date = new Date();
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        // Function to update chart with new sale
+        function updateChart() {
+            const today = getFormattedDate();
+            const todayIndex = chartLabels.indexOf(today);
+            
+            if (todayIndex === -1) {
+                // Add new day
+                chartLabels.push(today);
+                chartData.push(SALE_AMOUNT);
+            } else {
+                // Update existing day
+                chartData[todayIndex] += SALE_AMOUNT;
+            }
+            
+            // Keep only last 14 days
+            if (chartLabels.length > DAYS_TO_TRACK) {
+                chartLabels.shift();
+                chartData.shift();
+            }
+            
+            // Update chart if it exists
+            if (typeof salesChart !== 'undefined') {
+                salesChart.data.labels = chartLabels;
+                salesChart.data.datasets[0].data = chartData;
+                salesChart.update();
+            }
+        }
+
+        // Safe event listener addition
+        function addEventListenerSafely(elementId, eventType, handler) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.addEventListener(eventType, handler);
+            } else {
+                console.warn(`Element with id '${elementId}' not found for event '${eventType}'`);
+            }
+        }
+
+        // Cooldown state
+        let isInCooldown = false;
+        const COOLDOWN_DURATION = 3; // seconds
+
+        function startCooldown() {
+            const submitBtn = document.getElementById('submitSaleBtn');
+            const timerDisplay = submitBtn.querySelector('.cooldown-timer');
+            let timeLeft = COOLDOWN_DURATION;
+
+            // Disable button and show initial time
+            submitBtn.disabled = true;
+            isInCooldown = true;
+            
+            // Update timer display
+            function updateTimer() {
+                timerDisplay.textContent = `${timeLeft}s`;
+                const progress = ((COOLDOWN_DURATION - timeLeft) / COOLDOWN_DURATION) * 100;
+                submitBtn.style.setProperty('--progress', `${progress}%`);
+            }
+            
+            updateTimer();
+
+            // Start countdown
+            const cooldownInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+
+                if (timeLeft <= 0) {
+                    // Reset button state
+                    clearInterval(cooldownInterval);
+                    submitBtn.disabled = false;
+                    isInCooldown = false;
+                    timerDisplay.textContent = '';
+                    submitBtn.style.setProperty('--progress', '100%');
+                }
+            }, 1000);
+        }
+
+        // Array to store recent sales
+        let recentSales = [];
+        const MAX_RECENT_SALES = 5;
+
+        // Modified handleSaleSubmit function
+        function handleSaleSubmit(event) {
+            event.preventDefault();
+            
+            if (isInCooldown) return;
+
+            const customerName = document.getElementById('customerName')?.value || 'Unknown Customer';
+            const saleDate = document.getElementById('saleDate')?.value;
+            const saleAmount = parseFloat(document.getElementById('saleAmount')?.value || '7');
+            
+            // Add to recent sales
+            addRecentSale(customerName, saleAmount, saleDate);
+            
+            // Rest of the existing sale submission code
+            startCooldown();
+            salesTotal += saleAmount;
+            const salesCounter = document.getElementById('salesCounter');
+            if (salesCounter) {
+                salesCounter.textContent = `$${salesTotal}`;
+            }
+            
+            updateChart();
+            saveChartData();
+            showSuccessAnimation(customerName, saleAmount, saleDate);
+            
+            event.target.reset();
+            const amountInput = document.getElementById('saleAmount');
+            if (amountInput) {
+                amountInput.value = '7';
+            }
+            
+            updateAchievements(saleAmount);
+        }
+
+        // Function to add a recent sale
+        function addRecentSale(customer, amount, date) {
+            const saleDate = new Date(date);
+            const formattedDate = saleDate.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+
+            const sale = {
+                customer,
+                amount,
+                date: formattedDate
+            };
+
+            recentSales.unshift(sale); // Add to beginning of array
+            if (recentSales.length > MAX_RECENT_SALES) {
+                recentSales.pop(); // Remove oldest sale
+            }
+
+            updateRecentSalesList();
+            saveRecentSales();
+        }
+
+        // Function to update the recent sales list display
+        function updateRecentSalesList() {
+            const listElement = document.getElementById('recentSalesList');
+            if (!listElement) return;
+
+            listElement.innerHTML = recentSales.map(sale => `
+                <div class="sale-item">
+                    <div class="sale-info">
+                        <div class="customer-name">${sale.customer}</div>
+                        <div class="sale-date">${sale.date}</div>
+                    </div>
+                    <div class="sale-value">$${sale.amount}</div>
+                </div>
+            `).join('');
+        }
+
+        // Save recent sales to localStorage
+        function saveRecentSales() {
+            localStorage.setItem('recentSales', JSON.stringify(recentSales));
+        }
+
+        // Load recent sales from localStorage
+        function loadRecentSales() {
+            const saved = localStorage.getItem('recentSales');
+            if (saved) {
+                recentSales = JSON.parse(saved);
+                updateRecentSalesList();
+            }
+        }
+
+        // Load recent sales when page loads
+        window.addEventListener('load', loadRecentSales);
+
+        // Initialize date input safely
+        window.addEventListener('load', () => {
+            const dateInput = document.getElementById('saleDate');
+            if (dateInput) {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                dateInput.value = now.toISOString().slice(0, 16);
+            }
+            
+            // Initialize chart
+            initializeChart();
+        });
+
+        // Initialize chart safely
+        function initializeChart() {
+            const ctx = document.getElementById('salesChart')?.getContext('2d');
+            if (!ctx) {
+                console.warn('Sales chart canvas not found');
+                return;
+            }
+
+            try {
+                salesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Daily Sales Total',
+                            data: chartData,
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            borderColor: '#4CAF50',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    padding: 20,
+                                    boxWidth: 40,
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Total: $' + context.parsed.y;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'nearest'
+                        },
+                        animation: {
+                            duration: 750,
+                            easing: 'easeInOutQuart'
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing chart:', error);
+            }
+        }
+
+        // Handle service worker registration safely
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.warn('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // Load saved data from localStorage
+        function loadSavedData() {
+            const savedData = localStorage.getItem('chartData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                chartLabels = data.labels;
+                chartData = data.data;
+                salesTotal = chartData[chartData.length - 1] || 0;
+                
+                // Update chart data directly
+                salesChart.data.labels = chartLabels;
+                salesChart.data.datasets[0].data = chartData;
+                
+                salesCounter.textContent = `$${salesTotal}`;
+                salesChart.update();
+            }
+        }
+
+        // Save chart data to localStorage
+        function saveChartData() {
+            const data = {
+                labels: chartLabels,
+                data: chartData,
+                lastUpdate: new Date().toISOString()
+            };
+            localStorage.setItem('chartData', JSON.stringify(data));
+        }
+
+        // Modified resetSales function
+        function resetSales() {
+            salesTotal = 0;
+            salesCounter.textContent = `$${salesTotal}`;
+            chartLabels = [];
+            chartData = [];
+            salesChart.update();
+            saveChartData();
+        }
+
+        // Modified load event listener
+        window.addEventListener('load', () => {
+            loadSavedData();
+            
+            // If no data exists, initialize with today
+            if (chartLabels.length === 0) {
+                updateChart();
+                saveChartData();
+            }
+        });
+
+        // DOM elements
+        const salesCounter = document.getElementById('salesCounter');
+        const addSaleBtn = document.getElementById('addSaleBtn');
+        
+        // Add click event listener
+        addSaleBtn.addEventListener('click', addSale);
+        
+        // Add keyboard event listener for reset
+        document.addEventListener('keydown', (event) => {
+            if (event.key.toLowerCase() === 'r') {
+                resetSales();
+            }
+        });
+        
+        // Add touch event handling
+        document.addEventListener('touchstart', function() {}, {passive: true});
+
+        // Prevent double-tap zoom on buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault();
+            });
+        });
+
+        // Tab switching functionality
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update navigation highlighting
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[href="#${tabId}"]`).classList.add('active');
+        }
+
+        // Reminder handling
+        let activeReminders = [];
+
+        function handleReminderSubmit(event) {
+            event.preventDefault();
+            
+            const reminder = {
+                id: Date.now(),
+                title: document.getElementById('reminderTitle').value,
+                goal: document.getElementById('reminderGoal').value,
+                time: document.getElementById('reminderTime').value
+            };
+            
+            activeReminders.push(reminder);
+            saveReminders();
+            updateRemindersList();
+            
+            // Schedule notification
+            scheduleReminder(reminder);
+            
+            // Clear form
+            event.target.reset();
+            
+            // Show confirmation
+            showNotification('Reminder set successfully!');
+        }
+
+        function showReminderNow() {
+            const title = document.getElementById('reminderTitle').value;
+            const goal = document.getElementById('reminderGoal').value;
+            
+            if (!title || !goal) {
+                showNotification('Please fill in the reminder details first!', 'error');
+                return;
+            }
+            
+            showNotification(`Reminder: ${title} - Goal: $${goal}`);
+        }
+
+        function showNotification(message, type = 'success') {
+            const notificationsList = document.getElementById('notificationsList');
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">${message}</div>
+                <button class="notification-close" onclick="this.parentElement.remove()">✕</button>
+            `;
+            
+            // Add to notifications list
+            notificationsList.appendChild(notification);
+        }
+
+        function scheduleReminder(reminder) {
+            const timeUntilReminder = new Date(reminder.time) - new Date();
+            if (timeUntilReminder > 0) {
+                setTimeout(() => {
+                    showNotification(`Reminder: ${reminder.title} - Goal: $${reminder.goal}`);
+                }, timeUntilReminder);
+            }
+        }
+
+        function updateRemindersList() {
+            const remindersList = document.getElementById('remindersList');
+            remindersList.innerHTML = activeReminders
+                .map(reminder => `
+                    <div class="reminder-item">
+                        <div>
+                            <strong>${reminder.title}</strong>
+                            <div>Goal: $${reminder.goal}</div>
+                            <div>Time: ${new Date(reminder.time).toLocaleString()}</div>
+                        </div>
+                        <button class="reminder-button" onclick="deleteReminder(${reminder.id})">Delete</button>
+                    </div>
+                `).join('');
+        }
+
+        function deleteReminder(id) {
+            activeReminders = activeReminders.filter(r => r.id !== id);
+            saveReminders();
+            updateRemindersList();
+        }
+
+        function saveReminders() {
+            localStorage.setItem('reminders', JSON.stringify(activeReminders));
+        }
+
+        function loadReminders() {
+            const saved = localStorage.getItem('reminders');
+            if (saved) {
+                activeReminders = JSON.parse(saved);
+                updateRemindersList();
+                // Reschedule active reminders
+                activeReminders.forEach(scheduleReminder);
+            }
+        }
+
+        // Load reminders when page loads
+        window.addEventListener('load', loadReminders);
+
+        function setUnknownCustomer() {
+            document.getElementById('customerName').value = 'Unknown Customer';
+        }
+
+        function showSuccessAnimation(customer, amount, date) {
+            console.log('Showing success animation...'); // Debug log
+            
+            const overlay = document.querySelector('.success-overlay');
+            const popup = document.querySelector('.success-popup');
+            const details = document.querySelector('.sale-details');
+            
+            if (!overlay || !popup || !details) {
+                console.error('Required elements not found!');
+                return;
+            }
+            
+            console.log('Elements found, setting up animation...'); // Debug log
+            
+            // Set content
+            details.textContent = `${customer} - $${amount}`;
+            
+            // Show overlay first
+            overlay.style.display = 'flex';
+            
+            // Force reflow
+            void overlay.offsetWidth;
+            
+            // Add visible class
+            overlay.classList.add('visible');
+            
+            // Add show class to popup after a brief delay
+            setTimeout(() => {
+                popup.classList.add('show');
+                console.log('Animation classes added'); // Debug log
+            }, 10);
+            
+            // Setup click to dismiss
+            const hideOverlay = () => {
+                console.log('Hiding overlay...'); // Debug log
+                popup.classList.remove('show');
+                overlay.classList.remove('visible');
+                
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+                
+                overlay.removeEventListener('click', hideOverlay);
+            };
+            
+            overlay.addEventListener('click', hideOverlay);
+        }
+
+        // Achievement tracking
+        let achievements = {
+            firstSale: false,
+            sales100: 0,
+            streak: 0,
+            lastSaleDate: null
+        };
+
+        // Load saved achievements
+        function loadAchievements() {
+            const savedAchievements = localStorage.getItem('achievements');
+            if (savedAchievements) {
+                achievements = JSON.parse(savedAchievements);
+                updateAchievementDisplay();
+            }
+        }
+
+        // Save achievements
+        function saveAchievements() {
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+        }
+
+        // Update achievement display
+        function updateAchievementDisplay() {
+            // First Sale
+            document.getElementById('firstSaleProgress').textContent = 
+                achievements.firstSale ? 'Completed! 🎉' : 'Not Started';
+
+            // $100 in Sales
+            document.getElementById('sales100Progress').textContent = 
+                achievements.sales100 >= 100 ? 'Completed! 🎉' : `$${achievements.sales100}/100`;
+
+            // Streak
+            document.getElementById('streakProgress').textContent = 
+                `${achievements.streak}/7 days`;
+        }
+
+        // Update achievements when sale is made
+        function updateAchievements(saleAmount) {
+            // First Sale
+            if (!achievements.firstSale) {
+                achievements.firstSale = true;
+                showNotification('Achievement Unlocked: First Sale! 🌟');
+            }
+
+            // $100 in Sales
+            achievements.sales100 += saleAmount;
+            if (achievements.sales100 >= 100 && achievements.sales100 - saleAmount < 100) {
+                showNotification('Achievement Unlocked: $100 in Sales! 💎');
+            }
+
+            // Update streak
+            const today = new Date().toDateString();
+            if (achievements.lastSaleDate !== today) {
+                achievements.streak++;
+                achievements.lastSaleDate = today;
+                
+                if (achievements.streak === 7) {
+                    showNotification('Achievement Unlocked: 7-Day Streak! 🏆');
+                }
+            }
+
+            // Update display and save
+            updateAchievementDisplay();
+            saveAchievements();
+        }
+
+        // Prevent bounce effect on iOS
+        document.body.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.tab-content')) return;
+            e.preventDefault();
+        }, { passive: false });
+
+        // Handle viewport height on mobile browsers
+        function setViewportHeight() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        window.addEventListener('resize', setViewportHeight);
+        window.addEventListener('orientationchange', setViewportHeight);
+        setViewportHeight();
+    </script>
+</body>
+</html>
