@@ -6,8 +6,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4CAF50">
-    <title>Sales Tracker PWA</title>
+    <meta name="apple-mobile-web-app-title" content="Entropy">
+    <title>Entropy Sales Tracker</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1668-2388.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1536-2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1125-2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1242-2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)">
     <style>
         /* Reset and Base Styles */
         * {
@@ -1122,6 +1129,80 @@
             padding-right: 30px;
             padding-left: 40px; /* Make room for the dollar sign */
         }
+
+        /* Admin Button Styles */
+        .admin-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        /* Admin Modal Styles */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-modal-content {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .admin-modal-content h2 {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .admin-modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--grid-color);
+            border-radius: 6px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .admin-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .admin-buttons button:first-child {
+            background-color: #ff4444;
+            color: white;
+        }
+
+        .admin-buttons button:last-child {
+            background-color: var(--grid-color);
+            color: var(--text-color);
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -1185,6 +1266,21 @@
                     <span class="cooldown-timer"></span>
                 </button>
             </form>
+            
+            <!-- Add Admin Reset Button -->
+            <button onclick="showAdminPrompt()" class="admin-button">ADMIN</button>
+        </div>
+    </div>
+
+    <!-- Add Admin Password Modal -->
+    <div id="adminModal" class="admin-modal">
+        <div class="admin-modal-content">
+            <h2>Admin Access</h2>
+            <input type="password" id="adminPassword" placeholder="Enter password">
+            <div class="admin-buttons">
+                <button onclick="checkAdminPassword()">Submit</button>
+                <button onclick="closeAdminModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -1253,6 +1349,117 @@
     </nav>
 
     <script>
+        let salesTotal = 0;
+        let recentSales = [];
+        let chartLabels = [];
+        let chartData = [];
+
+        // Load data from server
+        async function loadData() {
+            try {
+                const response = await fetch('save_data.php');
+                const data = await response.json();
+                salesTotal = data.salesTotal || 0;
+                recentSales = data.recentSales || [];
+                chartLabels = data.chartLabels || [];
+                chartData = data.chartData || [];
+
+                // Update UI
+                document.getElementById('salesCounter').textContent = `$${salesTotal.toFixed(2)}`;
+                updateRecentSalesList();
+                if (chartLabels.length > 0) {
+                    salesChart.data.labels = chartLabels;
+                    salesChart.data.datasets[0].data = chartData;
+                    salesChart.update();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Save data to server
+        async function saveData() {
+            try {
+                const data = {
+                    salesTotal,
+                    recentSales,
+                    chartLabels,
+                    chartData
+                };
+                
+                await fetch('save_data.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+
+        // Update handleSaleSubmit
+        async function handleSaleSubmit(event) {
+            event.preventDefault();
+            
+            if (isInCooldown) return;
+
+            const customerName = document.getElementById('customerName')?.value || 'Unknown Customer';
+            const saleDate = document.getElementById('saleDate')?.value;
+            const saleAmount = parseFloat(document.getElementById('saleAmount')?.value || '0');
+            
+            // Add to recent sales
+            addRecentSale(customerName, saleAmount, saleDate);
+            
+            startCooldown();
+            salesTotal += saleAmount;
+            
+            const salesCounter = document.getElementById('salesCounter');
+            if (salesCounter) {
+                salesCounter.textContent = `$${salesTotal.toFixed(2)}`;
+            }
+            
+            updateChart();
+            await saveData(); // Save to server
+            showSuccessAnimation(customerName, saleAmount, saleDate);
+            
+            event.target.reset();
+            const amountInput = document.getElementById('saleAmount');
+            if (amountInput) {
+                amountInput.value = '7';
+            }
+        }
+
+        // Add periodic data refresh
+        function startDataRefresh() {
+            setInterval(loadData, 5000); // Refresh every 5 seconds
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', async () => {
+            await loadData();
+            startDataRefresh();
+        });
+
+        // Update reset function
+        async function resetAllData() {
+            salesTotal = 0;
+            recentSales = [];
+            chartLabels = [];
+            chartData = [];
+
+            await saveData();
+            
+            document.getElementById('salesCounter').textContent = '$0.00';
+            updateRecentSalesList();
+            if (typeof salesChart !== 'undefined') {
+                salesChart.data.labels = [];
+                salesChart.data.datasets[0].data = [];
+                salesChart.update();
+            }
+        }
+
         // Theme toggle functionality
         function toggleTheme() {
             const html = document.documentElement;
@@ -1273,15 +1480,6 @@
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
 
-        // Initialize sales total and daily tracking
-        let salesTotal = 0;
-        const SALE_AMOUNT = 7;
-        const DAYS_TO_TRACK = 14;
-        
-        // Initialize chart data arrays
-        let chartLabels = [];
-        let chartData = [];
-        
         // Function to get today's date in readable format
         function getFormattedDate() {
             const date = new Date();
@@ -1367,41 +1565,6 @@
             }, 1000);
         }
 
-        // Array to store recent sales
-        let recentSales = [];
-        const MAX_RECENT_SALES = 5;
-
-        // Modified handleSaleSubmit function
-        function handleSaleSubmit(event) {
-            event.preventDefault();
-            
-            if (isInCooldown) return;
-
-            const customerName = document.getElementById('customerName')?.value || 'Unknown Customer';
-            const saleDate = document.getElementById('saleDate')?.value;
-            const saleAmount = parseFloat(document.getElementById('saleAmount')?.value || '0');
-            
-            // Add to recent sales with potential negative value
-            addRecentSale(customerName, saleAmount, saleDate);
-            
-            startCooldown();
-            salesTotal += saleAmount; // This will now add or subtract based on the value
-            const salesCounter = document.getElementById('salesCounter');
-            if (salesCounter) {
-                salesCounter.textContent = `$${salesTotal.toFixed(2)}`;
-            }
-            
-            updateChart();
-            saveChartData();
-            showSuccessAnimation(customerName, saleAmount, saleDate);
-            
-            event.target.reset();
-            const amountInput = document.getElementById('saleAmount');
-            if (amountInput) {
-                amountInput.value = '7';
-            }
-        }
-
         // Function to add a recent sale
         function addRecentSale(customer, amount, date) {
             const saleDate = new Date(date);
@@ -1423,8 +1586,8 @@
                 recentSales.pop();
             }
 
+            localStorage.setItem('recentSales', JSON.stringify(recentSales));
             updateRecentSalesList();
-            saveRecentSales();
         }
 
         // Function to update the recent sales list display
@@ -1443,22 +1606,22 @@
             `).join('');
         }
 
-        // Save recent sales to localStorage
-        function saveRecentSales() {
-            localStorage.setItem('recentSales', JSON.stringify(recentSales));
-        }
-
-        // Load recent sales from localStorage
-        function loadRecentSales() {
-            const saved = localStorage.getItem('recentSales');
-            if (saved) {
-                recentSales = JSON.parse(saved);
-                updateRecentSalesList();
-            }
-        }
-
         // Load recent sales when page loads
-        window.addEventListener('load', loadRecentSales);
+        window.addEventListener('load', () => {
+            // Update sales counter
+            const salesCounter = document.getElementById('salesCounter');
+            if (salesCounter) {
+                salesCounter.textContent = `$${salesTotal.toFixed(2)}`;
+            }
+
+            // Update recent sales list
+            updateRecentSalesList();
+
+            // Initialize chart with saved data
+            if (chartLabels.length > 0 && chartData.length > 0) {
+                initializeChart();
+            }
+        });
 
         // Initialize date input safely
         window.addEventListener('load', () => {
@@ -1563,10 +1726,10 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js')
                     .then(registration => {
-                        console.log('Service Worker registered:', registration);
+                        console.log('ServiceWorker registration successful');
                     })
-                    .catch(error => {
-                        console.warn('Service Worker registration failed:', error);
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
                     });
             });
         }
@@ -1896,6 +2059,29 @@
         window.addEventListener('resize', fixMobileHeight);
         window.addEventListener('orientationchange', fixMobileHeight);
         fixMobileHeight();
+
+        // Admin Functions
+        function showAdminPrompt() {
+            document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('adminPassword').value = ''; // Clear password field
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        async function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === '2011') {
+                if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+                    await resetAllData();
+                    closeAdminModal();
+                    showNotification('All data has been reset successfully!');
+                }
+            } else {
+                alert('Incorrect password');
+            }
+        }
     </script>
 </body>
 </html>
