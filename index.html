@@ -1122,14 +1122,6 @@
                     </div>
                 </div>
 
-                <!-- Recent Sales List -->
-                <div class="recent-sales-card">
-                    <h3>Recent Sales</h3>
-                    <div id="recentSalesList" class="recent-sales-list">
-                        <!-- Sales will be added here dynamically -->
-                    </div>
-                </div>
-
                 <div class="chart-card">
                     <canvas id="salesChart"></canvas>
                 </div>
@@ -1202,54 +1194,12 @@
         </div>
     </div>
 
-    <!-- Achievements Tab -->
-    <div id="achievements" class="tab-content">
-        <div class="container">
-            <h1>Achievements</h1>
-            <div id="achievementsList">
-                <div class="achievement">
-                    <div class="achievement-icon">🌟</div>
-                    <div class="achievement-info">
-                        <div class="achievement-title">First Sale</div>
-                        <div class="achievement-progress" id="firstSaleProgress">Not Started</div>
-                    </div>
-                </div>
-                <div class="achievement">
-                    <div class="achievement-icon">💎</div>
-                    <div class="achievement-info">
-                        <div class="achievement-title">$100 in Sales</div>
-                        <div class="achievement-progress" id="sales100Progress">$0/100</div>
-                    </div>
-                </div>
-                <div class="achievement">
-                    <div class="achievement-icon">🏆</div>
-                    <div class="achievement-info">
-                        <div class="achievement-title">7-Day Streak</div>
-                        <div class="achievement-progress" id="streakProgress">0/7 days</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Coming Soon Section -->
-            <div class="coming-soon-section">
-                <div class="coming-soon-header">
-                    <h2>Coming Soon! 🚀</h2>
-                    <span class="new-badge">NEW</span>
-                </div>
-                <div class="feature-list">
-                    <div class="feature-item">
-                        <span class="feature-icon">🎯</span>
-                        <span>Monthly Sales Goals</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">📈</span>
-                        <span>Performance Analytics</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">🏅</span>
-                        <span>Custom Badges</span>
-                    </div>
-                </div>
+    <!-- Goals Tab -->
+    <div id="recent" class="tab-content">
+        <div class="recent-sales-card">
+            <h3>Recent Sales</h3>
+            <div id="recentSalesList" class="recent-sales-list">
+                <!-- Sales will be added here dynamically -->
             </div>
         </div>
     </div>
@@ -1264,13 +1214,13 @@
             <div class="nav-icon">💰</div>
             <span class="nav-text">Add Sale</span>
         </a>
+        <a href="#recent" class="nav-item" onclick="switchTab('recent')">
+            <div class="nav-icon">📝</div>
+            <span class="nav-text">Recent</span>
+        </a>
         <a href="#reminders" class="nav-item" onclick="switchTab('reminders')">
             <div class="nav-icon">⏰</div>
             <span class="nav-text">Reminders</span>
-        </a>
-        <a href="#achievements" class="nav-item" onclick="switchTab('achievements')">
-            <div class="nav-icon">🏆</div>
-            <span class="nav-text">Goals</span>
         </a>
     </nav>
 
@@ -1924,4 +1874,5 @@
     </script>
 </body>
 </html>
+
 
