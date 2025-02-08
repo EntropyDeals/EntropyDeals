@@ -1349,7 +1349,7 @@
     </nav>
 
     <script>
-        // Global variables
+        // Global variables with localStorage
         let salesData = {
             total: parseFloat(localStorage.getItem('salesTotal')) || 0,
             recent: JSON.parse(localStorage.getItem('recentSales')) || [],
@@ -1386,6 +1386,13 @@
                     }
                 }
             });
+
+            // Load saved chart data
+            const savedLabels = JSON.parse(localStorage.getItem('chartLabels')) || [];
+            const savedData = JSON.parse(localStorage.getItem('chartData')) || [];
+            salesData.chart.data.labels = savedLabels;
+            salesData.chart.data.datasets[0].data = savedData;
+            salesData.chart.update();
         }
 
         // Handle sale submission
@@ -1400,6 +1407,7 @@
             
             // Update total
             salesData.total += saleAmount;
+            localStorage.setItem('salesTotal', salesData.total);
             document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
             
             // Add to recent sales
@@ -1415,6 +1423,9 @@
                 amount: saleAmount,
                 date: formattedDate
             });
+            
+            // Save recent sales
+            localStorage.setItem('recentSales', JSON.stringify(salesData.recent));
             
             // Update recent sales list
             updateRecentSalesList();
@@ -1462,32 +1473,18 @@
                 salesData.chart.data.datasets[0].data[labelIndex] += amount;
             }
             
-            salesData.chart.update();
-        }
-
-        // Reset all data
-        function resetAllData() {
-            // Reset data
-            salesData.total = 0;
-            salesData.recent = [];
+            // Save chart data
+            localStorage.setItem('chartLabels', JSON.stringify(salesData.chart.data.labels));
+            localStorage.setItem('chartData', JSON.stringify(salesData.chart.data.datasets[0].data));
             
-            // Reset chart
-            salesData.chart.data.labels = [];
-            salesData.chart.data.datasets[0].data = [];
             salesData.chart.update();
-            
-            // Reset display
-            updateDisplay();
-            document.getElementById('recentSalesList').innerHTML = '';
-
-            // Clear localStorage
-            localStorage.clear();
         }
 
         // Initialize on page load
         window.addEventListener('load', () => {
             initializeChart();
-            document.getElementById('salesCounter').textContent = '$0.00';
+            document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
+            updateRecentSalesList();
         });
 
         // Admin password check
@@ -1973,5 +1970,6 @@
     </script>
 </body>
 </html>
+
 
 
