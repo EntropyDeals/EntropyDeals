@@ -1349,114 +1349,157 @@
     </nav>
 
     <script>
-        let salesTotal = 0;
-        let recentSales = [];
-        let chartLabels = [];
-        let chartData = [];
+        // Global variables
+        let salesData = {
+            total: parseFloat(localStorage.getItem('salesTotal')) || 0,
+            recent: JSON.parse(localStorage.getItem('recentSales')) || [],
+            chart: null
+        };
 
-        // Load data from server
-        async function loadData() {
-            try {
-                const response = await fetch('save_data.php');
-                const data = await response.json();
-                salesTotal = data.salesTotal || 0;
-                recentSales = data.recentSales || [];
-                chartLabels = data.chartLabels || [];
-                chartData = data.chartData || [];
-
-                // Update UI
-                document.getElementById('salesCounter').textContent = `$${salesTotal.toFixed(2)}`;
-                updateRecentSalesList();
-                if (chartLabels.length > 0) {
-                    salesChart.data.labels = chartLabels;
-                    salesChart.data.datasets[0].data = chartData;
-                    salesChart.update();
+        // Initialize chart
+        function initializeChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesData.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Daily Sales Total',
+                        data: [],
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        borderColor: '#4CAF50',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + value
+                            }
+                        }
+                    }
                 }
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
+            });
         }
 
-        // Save data to server
-        async function saveData() {
-            try {
-                const data = {
-                    salesTotal,
-                    recentSales,
-                    chartLabels,
-                    chartData
-                };
-                
-                await fetch('save_data.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-            } catch (error) {
-                console.error('Error saving data:', error);
-            }
-        }
-
-        // Update handleSaleSubmit
-        async function handleSaleSubmit(event) {
+        // Handle sale submission
+        function handleSaleSubmit(event) {
             event.preventDefault();
             
             if (isInCooldown) return;
 
-            const customerName = document.getElementById('customerName')?.value || 'Unknown Customer';
-            const saleDate = document.getElementById('saleDate')?.value;
-            const saleAmount = parseFloat(document.getElementById('saleAmount')?.value || '0');
+            const customerName = document.getElementById('customerName').value || 'Unknown Customer';
+            const saleDate = document.getElementById('saleDate').value;
+            const saleAmount = parseFloat(document.getElementById('saleAmount').value || '0');
+            
+            // Update total
+            salesData.total += saleAmount;
+            document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
             
             // Add to recent sales
-            addRecentSale(customerName, saleAmount, saleDate);
+            const formattedDate = new Date(saleDate).toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
             
-            startCooldown();
-            salesTotal += saleAmount;
+            salesData.recent.unshift({
+                customer: customerName,
+                amount: saleAmount,
+                date: formattedDate
+            });
             
-            const salesCounter = document.getElementById('salesCounter');
-            if (salesCounter) {
-                salesCounter.textContent = `$${salesTotal.toFixed(2)}`;
-            }
+            // Update recent sales list
+            updateRecentSalesList();
             
-            updateChart();
-            await saveData(); // Save to server
+            // Update chart
+            updateChart(saleDate, saleAmount);
+            
+            // Show success animation
             showSuccessAnimation(customerName, saleAmount, saleDate);
             
+            // Reset form
             event.target.reset();
-            const amountInput = document.getElementById('saleAmount');
-            if (amountInput) {
-                amountInput.value = '7';
-            }
+            document.getElementById('saleAmount').value = '7';
+            
+            startCooldown();
         }
 
-        // Add periodic data refresh
-        function startDataRefresh() {
-            setInterval(loadData, 5000); // Refresh every 5 seconds
+        // Update recent sales list
+        function updateRecentSalesList() {
+            const listElement = document.getElementById('recentSalesList');
+            if (!listElement) return;
+
+            listElement.innerHTML = salesData.recent.map(sale => `
+                <div class="sale-item">
+                    <div class="sale-info">
+                        <div class="customer-name">${sale.customer}</div>
+                        <div class="sale-date">${sale.date}</div>
+                    </div>
+                    <div class="sale-value ${sale.amount < 0 ? 'negative' : ''}">${sale.amount >= 0 ? '+' : ''}$${Math.abs(sale.amount).toFixed(2)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Update chart
+        function updateChart(saleDate, amount) {
+            const date = new Date(saleDate);
+            const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
+            
+            const labelIndex = salesData.chart.data.labels.indexOf(formattedDate);
+            
+            if (labelIndex === -1) {
+                salesData.chart.data.labels.push(formattedDate);
+                salesData.chart.data.datasets[0].data.push(amount);
+            } else {
+                salesData.chart.data.datasets[0].data[labelIndex] += amount;
+            }
+            
+            salesData.chart.update();
+        }
+
+        // Reset all data
+        function resetAllData() {
+            // Reset data
+            salesData.total = 0;
+            salesData.recent = [];
+            
+            // Reset chart
+            salesData.chart.data.labels = [];
+            salesData.chart.data.datasets[0].data = [];
+            salesData.chart.update();
+            
+            // Reset display
+            updateDisplay();
+            document.getElementById('recentSalesList').innerHTML = '';
+
+            // Clear localStorage
+            localStorage.clear();
         }
 
         // Initialize on page load
-        window.addEventListener('load', async () => {
-            await loadData();
-            startDataRefresh();
+        window.addEventListener('load', () => {
+            initializeChart();
+            document.getElementById('salesCounter').textContent = '$0.00';
         });
 
-        // Update reset function
-        async function resetAllData() {
-            salesTotal = 0;
-            recentSales = [];
-            chartLabels = [];
-            chartData = [];
-
-            await saveData();
-            
-            document.getElementById('salesCounter').textContent = '$0.00';
-            updateRecentSalesList();
-            if (typeof salesChart !== 'undefined') {
-                salesChart.data.labels = [];
-                salesChart.data.datasets[0].data = [];
-                salesChart.update();
+        // Admin password check
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === '2011') {
+                if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+                    localStorage.clear();
+                    window.location.reload();
+                }
+            } else {
+                alert('Incorrect password');
             }
         }
 
@@ -1469,10 +1512,10 @@
             localStorage.setItem('theme', newTheme);
             
             // Update chart colors if chart exists
-            if (typeof salesChart !== 'undefined') {
-                salesChart.options.scales.x.grid.color = getComputedStyle(document.body).getPropertyValue('--grid-color');
-                salesChart.options.scales.y.grid.color = getComputedStyle(document.body).getPropertyValue('--grid-color');
-                salesChart.update();
+            if (typeof salesData.chart !== 'undefined') {
+                salesData.chart.options.scales.x.grid.color = getComputedStyle(document.body).getPropertyValue('--grid-color');
+                salesData.chart.options.scales.y.grid.color = getComputedStyle(document.body).getPropertyValue('--grid-color');
+                salesData.chart.update();
             }
         }
 
@@ -1487,44 +1530,6 @@
                 month: 'short', 
                 day: 'numeric' 
             });
-        }
-
-        // Function to update chart with new sale
-        function updateChart() {
-            const today = getFormattedDate();
-            const todayIndex = chartLabels.indexOf(today);
-            
-            if (todayIndex === -1) {
-                // Add new day
-                chartLabels.push(today);
-                chartData.push(SALE_AMOUNT);
-            } else {
-                // Update existing day
-                chartData[todayIndex] += SALE_AMOUNT;
-            }
-            
-            // Keep only last 14 days
-            if (chartLabels.length > DAYS_TO_TRACK) {
-                chartLabels.shift();
-                chartData.shift();
-            }
-            
-            // Update chart if it exists
-            if (typeof salesChart !== 'undefined') {
-                salesChart.data.labels = chartLabels;
-                salesChart.data.datasets[0].data = chartData;
-                salesChart.update();
-            }
-        }
-
-        // Safe event listener addition
-        function addEventListenerSafely(elementId, eventType, handler) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.addEventListener(eventType, handler);
-            } else {
-                console.warn(`Element with id '${elementId}' not found for event '${eventType}'`);
-            }
         }
 
         // Cooldown state
@@ -1581,12 +1586,12 @@
                 date: formattedDate
             };
 
-            recentSales.unshift(sale);
-            if (recentSales.length > MAX_RECENT_SALES) {
-                recentSales.pop();
+            salesData.recent.unshift(sale);
+            if (salesData.recent.length > MAX_RECENT_SALES) {
+                salesData.recent.pop();
             }
 
-            localStorage.setItem('recentSales', JSON.stringify(recentSales));
+            localStorage.setItem('recentSales', JSON.stringify(salesData.recent));
             updateRecentSalesList();
         }
 
@@ -1595,7 +1600,7 @@
             const listElement = document.getElementById('recentSalesList');
             if (!listElement) return;
 
-            listElement.innerHTML = recentSales.map(sale => `
+            listElement.innerHTML = salesData.recent.map(sale => `
                 <div class="sale-item">
                     <div class="sale-info">
                         <div class="customer-name">${sale.customer}</div>
@@ -1605,23 +1610,6 @@
                 </div>
             `).join('');
         }
-
-        // Load recent sales when page loads
-        window.addEventListener('load', () => {
-            // Update sales counter
-            const salesCounter = document.getElementById('salesCounter');
-            if (salesCounter) {
-                salesCounter.textContent = `$${salesTotal.toFixed(2)}`;
-            }
-
-            // Update recent sales list
-            updateRecentSalesList();
-
-            // Initialize chart with saved data
-            if (chartLabels.length > 0 && chartData.length > 0) {
-                initializeChart();
-            }
-        });
 
         // Initialize date input safely
         window.addEventListener('load', () => {
@@ -1635,91 +1623,6 @@
             // Initialize chart
             initializeChart();
         });
-
-        // Initialize chart safely
-        function initializeChart() {
-            const ctx = document.getElementById('salesChart')?.getContext('2d');
-            if (!ctx) {
-                console.warn('Sales chart canvas not found');
-                return;
-            }
-
-            try {
-                salesChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [{
-                            label: 'Daily Sales Total',
-                            data: chartData,
-                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
-                            borderColor: '#4CAF50',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    padding: 20,
-                                    boxWidth: 40,
-                                    font: {
-                                        size: 14
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false,
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Total: $' + context.parsed.y;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.1)'
-                                },
-                                ticks: {
-                                    callback: function(value) {
-                                        return '$' + value;
-                                    }
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.1)'
-                                },
-                                ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                }
-                            }
-                        },
-                        interaction: {
-                            intersect: false,
-                            mode: 'nearest'
-                        },
-                        animation: {
-                            duration: 750,
-                            easing: 'easeInOutQuart'
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error initializing chart:', error);
-            }
-        }
 
         // Handle service worker registration safely
         if ('serviceWorker' in navigator) {
@@ -1739,24 +1642,22 @@
             const savedData = localStorage.getItem('chartData');
             if (savedData) {
                 const data = JSON.parse(savedData);
-                chartLabels = data.labels;
-                chartData = data.data;
-                salesTotal = chartData[chartData.length - 1] || 0;
+                salesData.total = data.data[data.data.length - 1] || 0;
                 
                 // Update chart data directly
-                salesChart.data.labels = chartLabels;
-                salesChart.data.datasets[0].data = chartData;
+                salesData.chart.data.labels = data.labels;
+                salesData.chart.data.datasets[0].data = data.data;
                 
-                salesCounter.textContent = `$${salesTotal}`;
-                salesChart.update();
+                salesCounter.textContent = `$${salesData.total}`;
+                salesData.chart.update();
             }
         }
 
         // Save chart data to localStorage
         function saveChartData() {
             const data = {
-                labels: chartLabels,
-                data: chartData,
+                labels: salesData.chart.data.labels,
+                data: salesData.chart.data.datasets[0].data,
                 lastUpdate: new Date().toISOString()
             };
             localStorage.setItem('chartData', JSON.stringify(data));
@@ -1764,11 +1665,11 @@
 
         // Modified resetSales function
         function resetSales() {
-            salesTotal = 0;
-            salesCounter.textContent = `$${salesTotal}`;
-            chartLabels = [];
-            chartData = [];
-            salesChart.update();
+            salesData.total = 0;
+            salesCounter.textContent = `$${salesData.total}`;
+            salesData.chart.data.labels = [];
+            salesData.chart.data.datasets[0].data = [];
+            salesData.chart.update();
             saveChartData();
         }
 
@@ -1777,7 +1678,7 @@
             loadSavedData();
             
             // If no data exists, initialize with today
-            if (chartLabels.length === 0) {
+            if (salesData.chart.data.labels.length === 0) {
                 updateChart();
                 saveChartData();
             }
@@ -1788,7 +1689,7 @@
         const addSaleBtn = document.getElementById('addSaleBtn');
         
         // Add click event listener
-        addSaleBtn.addEventListener('click', addSale);
+        addSaleBtn.addEventListener('click', handleSaleSubmit);
         
         // Add keyboard event listener for reset
         document.addEventListener('keydown', (event) => {
@@ -2068,19 +1969,6 @@
 
         function closeAdminModal() {
             document.getElementById('adminModal').style.display = 'none';
-        }
-
-        async function checkAdminPassword() {
-            const password = document.getElementById('adminPassword').value;
-            if (password === '2011') {
-                if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-                    await resetAllData();
-                    closeAdminModal();
-                    showNotification('All data has been reset successfully!');
-                }
-            } else {
-                alert('Incorrect password');
-            }
         }
     </script>
 </body>
