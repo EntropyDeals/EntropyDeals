@@ -1094,6 +1094,26 @@
         [data-theme="dark"] .sale-item {
             background: rgba(76, 175, 80, 0.05);
         }
+
+        /* Add styles for negative values */
+        #saleAmount {
+            text-align: right;
+            padding-right: 30px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group::before {
+            content: '$';
+            position: absolute;
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-color);
+            opacity: 0.7;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -1143,17 +1163,17 @@
                 </div>
                 
                 <div class="input-group">
-                    <label for="saleDate">Date of Sale</label>
+                    <label for="saleDate">Date</label>
                     <input type="datetime-local" id="saleDate" class="sale-input" required>
                 </div>
                 
                 <div class="input-group">
                     <label for="saleAmount">Amount ($)</label>
-                    <input type="number" id="saleAmount" class="sale-input" value="7" min="0" step="0.01" required>
+                    <input type="number" id="saleAmount" class="sale-input" value="7" step="0.01" required>
                 </div>
                 
                 <button type="submit" id="submitSaleBtn" class="sale-submit-btn">
-                    <span class="btn-text">Confirm Sale</span>
+                    <span class="btn-text">Confirm</span>
                     <span class="cooldown-timer"></span>
                 </button>
             </form>
@@ -1351,17 +1371,16 @@
 
             const customerName = document.getElementById('customerName')?.value || 'Unknown Customer';
             const saleDate = document.getElementById('saleDate')?.value;
-            const saleAmount = parseFloat(document.getElementById('saleAmount')?.value || '7');
+            const saleAmount = parseFloat(document.getElementById('saleAmount')?.value || '0');
             
-            // Add to recent sales
+            // Add to recent sales with potential negative value
             addRecentSale(customerName, saleAmount, saleDate);
             
-            // Rest of the existing sale submission code
             startCooldown();
-            salesTotal += saleAmount;
+            salesTotal += saleAmount; // This will now add or subtract based on the value
             const salesCounter = document.getElementById('salesCounter');
             if (salesCounter) {
-                salesCounter.textContent = `$${salesTotal}`;
+                salesCounter.textContent = `$${salesTotal.toFixed(2)}`;
             }
             
             updateChart();
@@ -1373,8 +1392,6 @@
             if (amountInput) {
                 amountInput.value = '7';
             }
-            
-            updateAchievements(saleAmount);
         }
 
         // Function to add a recent sale
@@ -1393,9 +1410,9 @@
                 date: formattedDate
             };
 
-            recentSales.unshift(sale); // Add to beginning of array
+            recentSales.unshift(sale);
             if (recentSales.length > MAX_RECENT_SALES) {
-                recentSales.pop(); // Remove oldest sale
+                recentSales.pop();
             }
 
             updateRecentSalesList();
@@ -1413,7 +1430,7 @@
                         <div class="customer-name">${sale.customer}</div>
                         <div class="sale-date">${sale.date}</div>
                     </div>
-                    <div class="sale-value">$${sale.amount}</div>
+                    <div class="sale-value ${sale.amount < 0 ? 'negative' : ''}">${sale.amount >= 0 ? '+' : ''}$${Math.abs(sale.amount).toFixed(2)}</div>
                 </div>
             `).join('');
         }
