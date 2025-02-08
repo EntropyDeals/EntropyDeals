@@ -1348,11 +1348,30 @@
         </a>
     </nav>
 
+    <!-- Add Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <script>
-        // Global variables with localStorage
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCpkLTwbENxKyXbfnP_1rCZGy1og1y7OB0",
+            authDomain: "entropy-deals.firebaseapp.com",
+            databaseURL: "https://entropy-deals-default-rtdb.firebaseio.com",
+            projectId: "entropy-deals",
+            storageBucket: "entropy-deals.firebasestorage.app",
+            messagingSenderId: "1001597960953",
+            appId: "1:1001597960953:web:93543eeb022990039c1828"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Global variables
         let salesData = {
-            total: parseFloat(localStorage.getItem('salesTotal')) || 0,
-            recent: JSON.parse(localStorage.getItem('recentSales')) || [],
+            total: 0,
+            recent: [],
             chart: null
         };
 
@@ -1386,60 +1405,102 @@
                     }
                 }
             });
+        }
 
-            // Load saved chart data
-            const savedLabels = JSON.parse(localStorage.getItem('chartLabels')) || [];
-            const savedData = JSON.parse(localStorage.getItem('chartData')) || [];
-            salesData.chart.data.labels = savedLabels;
-            salesData.chart.data.datasets[0].data = savedData;
-            salesData.chart.update();
+        // Initialize and load data from Firebase
+        function initializeApp() {
+            // Set up chart
+            initializeChart();
+            
+            // Load initial data from Firebase
+            database.ref('sales').once('value').then((snapshot) => {
+                const data = snapshot.val() || { total: 0, recent: [], chartLabels: [], chartData: [] };
+                salesData.total = data.total;
+                salesData.recent = data.recent || [];
+                
+                // Update chart
+                salesData.chart.data.labels = data.chartLabels || [];
+                salesData.chart.data.datasets[0].data = data.chartData || [];
+                salesData.chart.update();
+                
+                // Update UI
+                document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
+                updateRecentSalesList();
+            });
+
+            // Listen for real-time updates
+            database.ref('sales').on('value', (snapshot) => {
+                const data = snapshot.val() || { total: 0, recent: [], chartLabels: [], chartData: [] };
+                salesData.total = data.total;
+                salesData.recent = data.recent || [];
+                
+                // Update chart
+                salesData.chart.data.labels = data.chartLabels || [];
+                salesData.chart.data.datasets[0].data = data.chartData || [];
+                salesData.chart.update();
+                
+                // Update UI
+                document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
+                updateRecentSalesList();
+            });
         }
 
         // Handle sale submission
         function handleSaleSubmit(event) {
             event.preventDefault();
-            
             if (isInCooldown) return;
 
             const customerName = document.getElementById('customerName').value || 'Unknown Customer';
             const saleDate = document.getElementById('saleDate').value;
             const saleAmount = parseFloat(document.getElementById('saleAmount').value || '0');
-            
-            // Update total
-            salesData.total += saleAmount;
-            localStorage.setItem('salesTotal', salesData.total);
-            document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
-            
-            // Add to recent sales
-            const formattedDate = new Date(saleDate).toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit'
+
+            // Update data in Firebase
+            database.ref('sales').transaction((currentData) => {
+                const data = currentData || { 
+                    total: 0, 
+                    recent: [],
+                    chartLabels: [],
+                    chartData: []
+                };
+                
+                // Update total
+                data.total = (data.total || 0) + saleAmount;
+                
+                // Add to recent sales
+                const formattedDate = new Date(saleDate).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+                
+                data.recent = data.recent || [];
+                data.recent.unshift({
+                    customer: customerName,
+                    amount: saleAmount,
+                    date: formattedDate
+                });
+
+                // Update chart data
+                const chartDate = `${new Date(saleDate).getMonth() + 1}/${new Date(saleDate).getDate()}`;
+                const labelIndex = data.chartLabels ? data.chartLabels.indexOf(chartDate) : -1;
+                
+                if (labelIndex === -1) {
+                    data.chartLabels = data.chartLabels || [];
+                    data.chartData = data.chartData || [];
+                    data.chartLabels.push(chartDate);
+                    data.chartData.push(saleAmount);
+                } else {
+                    data.chartData[labelIndex] += saleAmount;
+                }
+
+                return data;
             });
-            
-            salesData.recent.unshift({
-                customer: customerName,
-                amount: saleAmount,
-                date: formattedDate
-            });
-            
-            // Save recent sales
-            localStorage.setItem('recentSales', JSON.stringify(salesData.recent));
-            
-            // Update recent sales list
-            updateRecentSalesList();
-            
-            // Update chart
-            updateChart(saleDate, saleAmount);
-            
-            // Show success animation
-            showSuccessAnimation(customerName, saleAmount, saleDate);
-            
-            // Reset form
+
+            // Reset form and show success
             event.target.reset();
             document.getElementById('saleAmount').value = '7';
-            
+            showSuccessAnimation(customerName, saleAmount, saleDate);
             startCooldown();
         }
 
@@ -1459,41 +1520,24 @@
             `).join('');
         }
 
-        // Update chart
-        function updateChart(saleDate, amount) {
-            const date = new Date(saleDate);
-            const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
-            
-            const labelIndex = salesData.chart.data.labels.indexOf(formattedDate);
-            
-            if (labelIndex === -1) {
-                salesData.chart.data.labels.push(formattedDate);
-                salesData.chart.data.datasets[0].data.push(amount);
-            } else {
-                salesData.chart.data.datasets[0].data[labelIndex] += amount;
-            }
-            
-            // Save chart data
-            localStorage.setItem('chartLabels', JSON.stringify(salesData.chart.data.labels));
-            localStorage.setItem('chartData', JSON.stringify(salesData.chart.data.datasets[0].data));
-            
-            salesData.chart.update();
-        }
-
         // Initialize on page load
-        window.addEventListener('load', () => {
-            initializeChart();
-            document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
-            updateRecentSalesList();
-        });
+        window.addEventListener('load', initializeApp);
 
-        // Admin password check
+        // Admin reset function
         function checkAdminPassword() {
             const password = document.getElementById('adminPassword').value;
             if (password === '2011') {
                 if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-                    localStorage.clear();
-                    window.location.reload();
+                    // Reset Firebase data
+                    database.ref('sales').set({
+                        total: 0,
+                        recent: [],
+                        chartLabels: [],
+                        chartData: []
+                    });
+                    
+                    closeAdminModal();
+                    showNotification('All data has been reset successfully!');
                 }
             } else {
                 alert('Incorrect password');
