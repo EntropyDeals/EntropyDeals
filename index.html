@@ -1095,17 +1095,18 @@
             background: rgba(76, 175, 80, 0.05);
         }
 
-        /* Add styles for negative values */
-        #saleAmount {
-            text-align: right;
-            padding-right: 30px;
-        }
-
+        /* Fix for dollar sign input */
         .input-group {
             position: relative;
         }
 
+        /* Remove the multiple dollar signs */
         .input-group::before {
+            content: none; /* Remove the automatic dollar sign */
+        }
+
+        /* Single dollar sign for amount input */
+        .amount-input-group::before {
             content: '$';
             position: absolute;
             left: 24px;
@@ -1113,6 +1114,13 @@
             transform: translateY(-50%);
             color: var(--text-color);
             opacity: 0.7;
+            pointer-events: none;
+        }
+
+        #saleAmount {
+            text-align: right;
+            padding-right: 30px;
+            padding-left: 40px; /* Make room for the dollar sign */
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1167,7 +1175,7 @@
                     <input type="datetime-local" id="saleDate" class="sale-input" required>
                 </div>
                 
-                <div class="input-group">
+                <div class="input-group amount-input-group">
                     <label for="saleAmount">Amount ($)</label>
                     <input type="number" id="saleAmount" class="sale-input" value="7" step="0.01" required>
                 </div>
