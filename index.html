@@ -2612,6 +2612,7 @@
                     li.className = 'sale-item';
                     li.innerHTML = `
                         <span class="sale-amount">$${sale.amount.toFixed(2)}</span>
+                        <span class="customer-name">${sale.customerName || 'Unknown'}</span>
                         <span class="sale-date">${sale.date}</span>
                     `;
                     salesList.appendChild(li);
