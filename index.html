@@ -1203,8 +1203,629 @@
             background-color: var(--grid-color);
             color: var(--text-color);
         }
+
+        /* Add these styles to your existing CSS */
+        .note-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--grid-color);
+            border-radius: 8px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        textarea.note-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .note-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .note-button:hover {
+            opacity: 0.9;
+        }
+
+        .notes-list {
+            margin-top: 20px;
+        }
+
+        .note-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .note-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .note-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .note-date {
+            font-size: 0.8em;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .note-content {
+            color: var(--text-color);
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .input-group {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        #noteTitle {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--grid-color);
+            border-radius: 8px;
+            font-size: 1em;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        #noteContent {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--grid-color);
+            border-radius: 8px;
+            font-size: 1em;
+            resize: vertical;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .add-button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .add-button:hover {
+            opacity: 0.9;
+        }
+
+        button.delete-note {
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        button.delete-note:hover {
+            opacity: 0.9;
+        }
+
+        .no-notes {
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.7;
+            padding: 20px;
+        }
+
+        /* Add to your existing CSS */
+        .success-animation.error .success-content {
+            background: #ff4444;
+            border-left: 4px solid #cc0000;
+        }
+
+        .success-animation.error .success-icon {
+            color: #cc0000;
+        }
+
+        /* Add to your existing CSS */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .confirm-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 90%;
+            width: 300px;
+        }
+
+        .confirm-content h3 {
+            margin: 0 0 10px 0;
+            color: var(--text-color);
+        }
+
+        .confirm-content p {
+            margin: 0 0 20px 0;
+            color: var(--text-color);
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .confirm-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s ease;
+        }
+
+        .cancel-btn {
+            background: var(--grid-color);
+            color: var(--text-color);
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+        }
+
+        .confirm-buttons button:hover {
+            opacity: 0.9;
+        }
+
+        /* Add to your existing CSS */
+        .note-item.pinned {
+            border: 2px solid var(--primary-color);
+            background: linear-gradient(to right, var(--card-bg), rgba(76, 175, 80, 0.05));
+        }
+
+        .note-item.archived {
+            opacity: 0.7;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pin-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .pin-button:hover {
+            opacity: 0.9;
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .note-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Rich Text Editor Styles */
+        .editor-toolbar {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--grid-color);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .toolbar-btn {
+            padding: 8px;
+            background: none;
+            border: none;
+            border-radius: 4px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--grid-color);
+        }
+
+        .toolbar-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            background: var(--grid-color);
+            margin: 0 5px;
+        }
+
+        .rich-editor {
+            min-height: 150px;
+            padding: 12px;
+            background: var(--bg-color);
+            border: 1px solid var(--grid-color);
+            border-radius: 0 0 8px 8px;
+            color: var(--text-color);
+            overflow-y: auto;
+            outline: none;
+        }
+
+        .rich-editor:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Checkbox styles */
+        .todo-checkbox {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        /* Link styles */
+        .note-link {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        /* Note display styles */
+        .note-content {
+            line-height: 1.6;
+        }
+
+        .note-content ul, 
+        .note-content ol {
+            margin-left: 20px;
+        }
+
+        .note-content a {
+            color: var(--primary-color);
+        }
+
+        /* Mobile Optimizations */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .input-group {
+                padding: 15px;
+            }
+
+            /* Toolbar adjustments */
+            .editor-toolbar {
+                flex-wrap: wrap;
+                gap: 2px;
+                padding: 5px;
+            }
+
+            .toolbar-btn {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            /* Note display adjustments */
+            .note-item {
+                padding: 12px;
+            }
+
+            .note-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .note-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .pin-button,
+            .delete-note {
+                padding: 8px 12px;
+                width: 48%;
+            }
+
+            /* Success animation adjustments */
+            .success-animation {
+                width: 90%;
+                left: 5%;
+                right: 5%;
+            }
+
+            /* Navigation adjustments */
+            .nav-bar {
+                padding: 10px 5px;
+            }
+
+            .nav-item {
+                padding: 8px;
+            }
+
+            .nav-icon {
+                font-size: 20px;
+            }
+
+            .nav-text {
+                font-size: 12px;
+            }
+
+            /* Rich editor adjustments */
+            .rich-editor {
+                min-height: 120px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            #noteTitle {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            /* Confirmation modal adjustments */
+            .confirm-content {
+                width: 90%;
+                max-width: 300px;
+                padding: 15px;
+            }
+        }
+
+        /* Touch-friendly adjustments */
+        @media (hover: none) {
+            .note-item:hover {
+                transform: none;
+            }
+
+            .toolbar-btn:hover {
+                background: none;
+            }
+
+            .toolbar-btn:active {
+                background: var(--grid-color);
+            }
+        }
+
+        /* Analytics Styles */
+        .analytics-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            margin-top: 20px;
+        }
+
+        .analytics-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+            grid-column: span 3;  /* Make charts full width */
+        }
+
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .weekly-chart {
+            margin-top: 10px;
+        }
+
+        .prediction-card {
+            background: linear-gradient(135deg, var(--card-bg), rgba(33, 150, 243, 0.1));
+        }
+
+        .prediction-trend {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        #predictedGrowth {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .date-subtext {
+            font-size: 0.9em;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* Mobile adjustments */
+        @media screen and (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .chart-container {
+                height: 250px;
+                padding: 15px;
+                grid-column: 1;
+            }
+            
+            .analytics-value {
+                font-size: 1.5em;
+            }
+        }
+
+        /* Mobile UI Improvements */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            }
+
+            /* Better touch targets */
+            .nav-item {
+                padding: 12px 8px;
+                min-height: 44px; /* iOS minimum touch target */
+            }
+
+            .nav-icon {
+                font-size: 24px;
+                margin-bottom: 4px;
+            }
+
+            /* Card improvements */
+            .analytics-card {
+                padding: 16px;
+                margin-bottom: 12px;
+                touch-action: pan-y; /* Enable vertical scrolling */
+            }
+
+            .analytics-value {
+                font-size: 24px;
+                line-height: 1.3;
+            }
+
+            /* Chart containers */
+            .chart-container {
+                touch-action: pan-x pan-y; /* Enable both horizontal and vertical scrolling */
+                user-select: none; /* Prevent text selection while scrolling */
+                -webkit-user-select: none;
+                height: 280px;
+                padding: 12px;
+                margin: 8px 0;
+            }
+
+            /* Improved scrolling container */
+            .tab-content {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 80px; /* Space for navigation */
+                height: calc(100vh - 60px); /* Full height minus nav */
+            }
+
+            /* Better touch feedback */
+            .nav-item:active {
+                opacity: 0.7;
+                transform: scale(0.98);
+            }
+
+            .analytics-card:active {
+                transform: scale(0.99);
+            }
+
+            /* Smoother transitions */
+            .nav-item, .analytics-card {
+                transition: transform 0.1s ease-out;
+            }
+
+            /* Improved text readability */
+            h1 {
+                font-size: 24px;
+                margin: 16px 0;
+            }
+
+            h3 {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .date-subtext {
+                font-size: 14px;
+            }
+
+            /* Better spacing for analytics grid */
+            .analytics-grid {
+                gap: 12px;
+                padding: 8px 0;
+            }
+        }
+
+        /* Touch-specific improvements */
+        @media (hover: none) {
+            /* Prevent sticky hover states */
+            .nav-item:hover,
+            .analytics-card:hover {
+                transform: none;
+            }
+
+            /* Active states for touch */
+            .nav-item:active,
+            .analytics-card:active {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+        }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Replace the existing Chart.js script with this -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
@@ -1293,28 +1914,43 @@
         </div>
     </div>
 
-    <!-- Reminders Tab -->
-    <div id="reminders" class="tab-content">
+    <!-- Notes Tab -->
+    <div id="notes" class="tab-content">
         <div class="container">
-            <h1>Reminders</h1>
-            <form class="reminder-form" onsubmit="handleReminderSubmit(event)">
-                <input type="text" id="reminderTitle" class="reminder-input" placeholder="Reminder title" required>
-                <input type="number" id="reminderGoal" class="reminder-input" placeholder="Sales goal" required>
-                <input type="datetime-local" id="reminderTime" class="reminder-input" required>
-                <div class="reminder-buttons">
-                    <button type="submit" class="reminder-button">Set Reminder</button>
-                    <button type="button" class="reminder-button secondary" onclick="showReminderNow()">Show Now</button>
+            <h1>Notes</h1>
+            <div class="input-group">
+                <input type="text" id="noteTitle" placeholder="Note title" required>
+                <div class="editor-toolbar">
+                    <button type="button" onclick="formatText('bold')" class="toolbar-btn" title="Bold">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button type="button" onclick="formatText('italic')" class="toolbar-btn" title="Italic">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button type="button" onclick="formatText('underline')" class="toolbar-btn" title="Underline">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                    <div class="toolbar-separator"></div>
+                    <button type="button" onclick="formatText('insertUnorderedList')" class="toolbar-btn" title="Bullet List">
+                        <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button type="button" onclick="formatText('insertOrderedList')" class="toolbar-btn" title="Numbered List">
+                        <i class="fas fa-list-ol"></i>
+                    </button>
+                    <div class="toolbar-separator"></div>
+                    <button type="button" onclick="addCheckbox()" class="toolbar-btn" title="Add Checkbox">
+                        <i class="fas fa-check-square"></i>
+                    </button>
+                    <button type="button" onclick="addLink()" class="toolbar-btn" title="Add Link">
+                        <i class="fas fa-link"></i>
+                    </button>
                 </div>
-            </form>
-            
-            <!-- Active Reminders List -->
-            <div class="active-reminders">
-                <h2>Active Reminders</h2>
-                <div id="remindersList"></div>
+                <div id="noteContent" class="rich-editor" contenteditable="true"></div>
+                <button onclick="addNote()" class="add-button">Add Note</button>
             </div>
-
-            <!-- Notifications will appear here -->
-            <div id="notificationsList" style="width: 90%; max-width: 500px;"></div>
+            <div id="notesList" class="notes-list">
+                <!-- Notes will appear here -->
+            </div>
         </div>
     </div>
 
@@ -1324,6 +1960,44 @@
             <h3>Recent Sales</h3>
             <div id="recentSalesList" class="recent-sales-list">
                 <!-- Sales will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div id="analytics" class="tab-content">
+        <div class="container">
+            <h1>Sales Analytics</h1>
+            
+            <div class="analytics-grid">
+                <!-- Summary Cards -->
+                <div class="analytics-card">
+                    <h3>Total Sales</h3>
+                    <div class="analytics-value" id="totalSales">$0</div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Highest Day</h3>
+                    <div class="analytics-value" id="highestDay">$0</div>
+                    <div class="date-subtext" id="highestDayDate">-</div>
+                </div>
+                <div class="analytics-card prediction-card">
+                    <h3>Predicted Weekly Sales</h3>
+                    <div class="analytics-value" id="predictedSales">$0</div>
+                    <div class="prediction-trend">
+                        <span id="predictedGrowth">0%</span> trend
+                    </div>
+                </div>
+                
+                <!-- Charts -->
+                <div class="chart-container">
+                    <h3>Weekly Sales</h3>
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+                
+                <div class="chart-container prediction-chart">
+                    <h3>Sales Predictions</h3>
+                    <canvas id="predictionsChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -1338,13 +2012,17 @@
             <div class="nav-icon">💰</div>
             <span class="nav-text">Add Sale</span>
         </a>
+        <a href="#analytics" class="nav-item" onclick="switchTab('analytics')">
+            <div class="nav-icon">📊</div>
+            <span class="nav-text">Analytics</span>
+        </a>
         <a href="#recent" class="nav-item" onclick="switchTab('recent')">
             <div class="nav-icon">📝</div>
             <span class="nav-text">Recent</span>
         </a>
-        <a href="#reminders" class="nav-item" onclick="switchTab('reminders')">
-            <div class="nav-icon">⏰</div>
-            <span class="nav-text">Reminders</span>
+        <a href="#notes" class="nav-item" onclick="switchTab('notes')">
+            <div class="nav-icon">📔</div>
+            <span class="nav-text">Notes</span>
         </a>
     </nav>
 
@@ -1353,7 +2031,15 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script>
-        // Your web app's Firebase configuration
+        // First, declare global variables
+        let analyticsCharts = {
+            weeklyChart: null,
+            predictionsChart: null
+        };
+
+        let database; // Declare database globally
+
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCpkLTwbENxKyXbfnP_1rCZGy1og1y7OB0",
             authDomain: "entropy-deals.firebaseapp.com",
@@ -1365,8 +2051,22 @@
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database(); // Assign to global variable
+            console.log('Firebase initialized');
+
+            // Test Firebase connection
+            database.ref('.info/connected').on('value', (snapshot) => {
+                if (snapshot.val() === true) {
+                    console.log('✅ Firebase connection successful');
+                } else {
+                    console.log('⚠️ Firebase connection pending...');
+                }
+            });
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+        }
 
         // Global variables
         let salesData = {
@@ -1377,6 +2077,11 @@
 
         // Initialize chart
         function initializeChart() {
+            // Destroy existing chart if it exists
+            if (salesData.chart) {
+                salesData.chart.destroy();
+            }
+
             const ctx = document.getElementById('salesChart').getContext('2d');
             salesData.chart = new Chart(ctx, {
                 type: 'line',
@@ -1407,613 +2112,516 @@
             });
         }
 
-        // Initialize and load data from Firebase
+        // Initialize app
         function initializeApp() {
-            // Set up chart
-            initializeChart();
-            
-            // Load initial data from Firebase
-            database.ref('sales').once('value').then((snapshot) => {
-                const data = snapshot.val() || { total: 0, recent: [], chartLabels: [], chartData: [] };
-                salesData.total = data.total;
-                salesData.recent = data.recent || [];
+            // Initialize chart
+            if (document.getElementById('salesChart')) {
+                initializeChart();
                 
-                // Update chart
-                salesData.chart.data.labels = data.chartLabels || [];
-                salesData.chart.data.datasets[0].data = data.chartData || [];
-                salesData.chart.update();
-                
-                // Update UI
-                document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
-                updateRecentSalesList();
-            });
-
-            // Listen for real-time updates
-            database.ref('sales').on('value', (snapshot) => {
-                const data = snapshot.val() || { total: 0, recent: [], chartLabels: [], chartData: [] };
-                salesData.total = data.total;
-                salesData.recent = data.recent || [];
-                
-                // Update chart
-                salesData.chart.data.labels = data.chartLabels || [];
-                salesData.chart.data.datasets[0].data = data.chartData || [];
-                salesData.chart.update();
-                
-                // Update UI
-                document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
-                updateRecentSalesList();
-            });
-        }
-
-        // Handle sale submission
-        function handleSaleSubmit(event) {
-            event.preventDefault();
-            if (isInCooldown) return;
-
-            const customerName = document.getElementById('customerName').value || 'Unknown Customer';
-            const saleDate = document.getElementById('saleDate').value;
-            const saleAmount = parseFloat(document.getElementById('saleAmount').value || '0');
-
-            // Update data in Firebase
-            database.ref('sales').transaction((currentData) => {
-                const data = currentData || { 
-                    total: 0, 
-                    recent: [],
-                    chartLabels: [],
-                    chartData: []
-                };
-                
-                // Update total
-                data.total = (data.total || 0) + saleAmount;
-                
-                // Add to recent sales
-                const formattedDate = new Date(saleDate).toLocaleString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit'
-                });
-                
-                data.recent = data.recent || [];
-                data.recent.unshift({
-                    customer: customerName,
-                    amount: saleAmount,
-                    date: formattedDate
+                // Load initial data from Firebase
+                database.ref('sales').once('value').then((snapshot) => {
+                    const data = snapshot.val() || { total: 0, recent: [], chartLabels: [], chartData: [] };
+                    salesData.total = data.total;
+                    salesData.recent = data.recent || [];
+                    
+                    // Update chart
+                    salesData.chart.data.labels = data.chartLabels || [];
+                    salesData.chart.data.datasets[0].data = data.chartData || [];
+                    salesData.chart.update();
+                    
+                    // Update UI
+                    document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
+                    updateRecentSalesList();
                 });
 
-                // Update chart data
-                const chartDate = `${new Date(saleDate).getMonth() + 1}/${new Date(saleDate).getDate()}`;
-                const labelIndex = data.chartLabels ? data.chartLabels.indexOf(chartDate) : -1;
-                
-                if (labelIndex === -1) {
-                    data.chartLabels = data.chartLabels || [];
-                    data.chartData = data.chartData || [];
-                    data.chartLabels.push(chartDate);
-                    data.chartData.push(saleAmount);
-                } else {
-                    data.chartData[labelIndex] += saleAmount;
-                }
-
-                return data;
-            });
-
-            // Reset form and show success
-            event.target.reset();
-            document.getElementById('saleAmount').value = '7';
-            showSuccessAnimation(customerName, saleAmount, saleDate);
-            startCooldown();
-        }
-
-        // Update recent sales list
-        function updateRecentSalesList() {
-            const listElement = document.getElementById('recentSalesList');
-            if (!listElement) return;
-
-            listElement.innerHTML = salesData.recent.map(sale => `
-                <div class="sale-item">
-                    <div class="sale-info">
-                        <div class="customer-name">${sale.customer}</div>
-                        <div class="sale-date">${sale.date}</div>
-                    </div>
-                    <div class="sale-value ${sale.amount < 0 ? 'negative' : ''}">${sale.amount >= 0 ? '+' : ''}$${Math.abs(sale.amount).toFixed(2)}</div>
-                </div>
-            `).join('');
+                // Listen for real-time updates
+                database.ref('sales').on('value', (snapshot) => {
+                    const data = snapshot.val() || { total: 0, recent: [], chartLabels: [], chartData: [] };
+                    salesData.total = data.total;
+                    salesData.recent = data.recent || [];
+                    
+                    // Update chart
+                    salesData.chart.data.labels = data.chartLabels || [];
+                    salesData.chart.data.datasets[0].data = data.chartData || [];
+                    salesData.chart.update();
+                    
+                    // Update UI
+                    document.getElementById('salesCounter').textContent = `$${salesData.total.toFixed(2)}`;
+                    updateRecentSalesList();
+                });
+            }
         }
 
         // Initialize on page load
-        window.addEventListener('load', initializeApp);
-
-        // Admin reset function
-        function checkAdminPassword() {
-            const password = document.getElementById('adminPassword').value;
-            if (password === '2011') {
-                if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
-                    // Reset Firebase data
-                    database.ref('sales').set({
-                        total: 0,
-                        recent: [],
-                        chartLabels: [],
-                        chartData: []
-                    });
-                    
-                    closeAdminModal();
-                    showNotification('All data has been reset successfully!');
-                }
-            } else {
-                alert('Incorrect password');
-            }
-        }
-
-        // Theme toggle functionality
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            
-            // Update chart colors if chart exists
-            if (typeof salesData.chart !== 'undefined') {
-                salesData.chart.options.scales.x.grid.color = getComputedStyle(document.body).getPropertyValue('--grid-color');
-                salesData.chart.options.scales.y.grid.color = getComputedStyle(document.body).getPropertyValue('--grid-color');
-                salesData.chart.update();
-            }
-        }
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-
-        // Function to get today's date in readable format
-        function getFormattedDate() {
-            const date = new Date();
-            return date.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric' 
-            });
-        }
-
-        // Cooldown state
-        let isInCooldown = false;
-        const COOLDOWN_DURATION = 3; // seconds
-
-        function startCooldown() {
-            const submitBtn = document.getElementById('submitSaleBtn');
-            const timerDisplay = submitBtn.querySelector('.cooldown-timer');
-            let timeLeft = COOLDOWN_DURATION;
-
-            // Disable button and show initial time
-            submitBtn.disabled = true;
-            isInCooldown = true;
-            
-            // Update timer display
-            function updateTimer() {
-                timerDisplay.textContent = `${timeLeft}s`;
-                const progress = ((COOLDOWN_DURATION - timeLeft) / COOLDOWN_DURATION) * 100;
-                submitBtn.style.setProperty('--progress', `${progress}%`);
-            }
-            
-            updateTimer();
-
-            // Start countdown
-            const cooldownInterval = setInterval(() => {
-                timeLeft--;
-                updateTimer();
-
-                if (timeLeft <= 0) {
-                    // Reset button state
-                    clearInterval(cooldownInterval);
-                    submitBtn.disabled = false;
-                    isInCooldown = false;
-                    timerDisplay.textContent = '';
-                    submitBtn.style.setProperty('--progress', '100%');
-                }
-            }, 1000);
-        }
-
-        // Function to add a recent sale
-        function addRecentSale(customer, amount, date) {
-            const saleDate = new Date(date);
-            const formattedDate = saleDate.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit'
-            });
-
-            const sale = {
-                customer,
-                amount,
-                date: formattedDate
-            };
-
-            salesData.recent.unshift(sale);
-            if (salesData.recent.length > MAX_RECENT_SALES) {
-                salesData.recent.pop();
-            }
-
-            localStorage.setItem('recentSales', JSON.stringify(salesData.recent));
-            updateRecentSalesList();
-        }
-
-        // Function to update the recent sales list display
-        function updateRecentSalesList() {
-            const listElement = document.getElementById('recentSalesList');
-            if (!listElement) return;
-
-            listElement.innerHTML = salesData.recent.map(sale => `
-                <div class="sale-item">
-                    <div class="sale-info">
-                        <div class="customer-name">${sale.customer}</div>
-                        <div class="sale-date">${sale.date}</div>
-                    </div>
-                    <div class="sale-value ${sale.amount < 0 ? 'negative' : ''}">${sale.amount >= 0 ? '+' : ''}$${Math.abs(sale.amount).toFixed(2)}</div>
-                </div>
-            `).join('');
-        }
-
-        // Initialize date input safely
         window.addEventListener('load', () => {
-            const dateInput = document.getElementById('saleDate');
-            if (dateInput) {
-                const now = new Date();
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                dateInput.value = now.toISOString().slice(0, 16);
-            }
-            
-            // Initialize chart
-            initializeChart();
+            initializeApp();
+            loadNotes();
         });
 
-        // Handle service worker registration safely
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
+        // Function to add a sale
+        function addSale(amount, date) {
+            return database.ref('sales/recent').push({
+                amount: parseFloat(amount),
+                date: date || new Date().toLocaleString(),
+                timestamp: Date.now()
+            }).then(() => {
+                console.log('Sale added successfully');
+                return database.ref('sales/total').transaction(currentTotal => {
+                    return (currentTotal || 0) + parseFloat(amount);
+                });
+            }).catch(error => {
+                console.error('Error adding sale:', error);
+                showErrorAnimation('Failed to add sale. Please try again.');
+            });
+        }
+
+        // Function to handle form submission
+        document.getElementById('saleForm').onsubmit = function(e) {
+            e.preventDefault();
+            const amount = document.getElementById('saleAmount').value;
+            if (amount) {
+                addSale(amount)
+                    .then(() => {
+                        document.getElementById('saleAmount').value = '';
+                        showSuccessAnimation('Sale added successfully!');
                     })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showErrorAnimation('Failed to add sale. Please try again.');
                     });
-            });
-        }
-
-        // Load saved data from localStorage
-        function loadSavedData() {
-            const savedData = localStorage.getItem('chartData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                salesData.total = data.data[data.data.length - 1] || 0;
-                
-                // Update chart data directly
-                salesData.chart.data.labels = data.labels;
-                salesData.chart.data.datasets[0].data = data.data;
-                
-                salesCounter.textContent = `$${salesData.total}`;
-                salesData.chart.update();
             }
-        }
+        };
 
-        // Save chart data to localStorage
-        function saveChartData() {
-            const data = {
-                labels: salesData.chart.data.labels,
-                data: salesData.chart.data.datasets[0].data,
-                lastUpdate: new Date().toISOString()
-            };
-            localStorage.setItem('chartData', JSON.stringify(data));
-        }
+        // Update analytics when sales change
+        database.ref('sales').on('value', (snapshot) => {
+            console.log('Sales data updated');
+            const data = snapshot.val() || { total: 0, recent: [] };
+            updateAnalytics(data);
+        }, (error) => {
+            console.error('Error loading sales:', error);
+        });
 
-        // Modified resetSales function
-        function resetSales() {
-            salesData.total = 0;
-            salesCounter.textContent = `$${salesData.total}`;
-            salesData.chart.data.labels = [];
-            salesData.chart.data.datasets[0].data = [];
-            salesData.chart.update();
-            saveChartData();
-        }
-
-        // Modified load event listener
-        window.addEventListener('load', () => {
-            loadSavedData();
+        // Initialize Firebase and load data
+        function initializeFirebase() {
+            console.log('Initializing Firebase...');
             
-            // If no data exists, initialize with today
-            if (salesData.chart.data.labels.length === 0) {
-                updateChart();
-                saveChartData();
-            }
-        });
-
-        // DOM elements
-        const salesCounter = document.getElementById('salesCounter');
-        const addSaleBtn = document.getElementById('addSaleBtn');
-        
-        // Add click event listener
-        addSaleBtn.addEventListener('click', handleSaleSubmit);
-        
-        // Add keyboard event listener for reset
-        document.addEventListener('keydown', (event) => {
-            if (event.key.toLowerCase() === 'r') {
-                resetSales();
-            }
-        });
-        
-        // Add touch event handling
-        document.addEventListener('touchstart', function() {}, {passive: true});
-
-        // Prevent double-tap zoom on buttons
-        document.querySelectorAll('button').forEach(button => {
-            button.addEventListener('touchend', (e) => {
-                e.preventDefault();
+            // Check connection status
+            database.ref('.info/connected').on('value', (snap) => {
+                if (snap.val() === true) {
+                    console.log('✅ Firebase connection successful');
+                    loadAnalyticsData();
+                } else {
+                    console.log('⚠️ Firebase connection pending...');
+                    // Only retry if we're not already connected
+                    setTimeout(() => {
+                        if (!database.ref('.info/connected').once('value')) {
+                            initializeFirebase();
+                        }
+                    }, 2000);
+                }
             });
+        }
+
+        // Load initial data
+        function loadAnalyticsData() {
+            console.log('Loading analytics data...');
+            database.ref('sales').once('value')
+                .then(snapshot => {
+                    console.log('Initial sales data loaded');
+                    const data = snapshot.val() || { total: 0, recent: [] };
+                    updateAnalytics(data);
+                })
+                .catch(error => {
+                    console.error('Error loading initial sales data:', error);
+                    updateAnalytics({ total: 0, recent: [] });
+                });
+        }
+
+        // Initialize when document loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Document loaded, initializing Firebase...');
+            initializeFirebase();
         });
 
-        // Tab switching functionality
+        // Initialize Firebase and check connection
+        function initializeFirebase() {
+            // Check connection status
+            const connectedRef = database.ref(".info/connected");
+            connectedRef.on("value", (snap) => {
+                if (snap.val() === true) {
+                    console.log('✅ Firebase connection successful');
+                    // Load initial data once connected
+                    loadAnalyticsData();
+                } else {
+                    console.log('⚠️ Firebase connection pending...');
+                    // Retry connection after a delay
+                    setTimeout(initializeFirebase, 2000);
+                }
+            });
+        }
+
+        // Load analytics data
+        function loadAnalyticsData() {
+            database.ref('sales').once('value')
+                .then(snapshot => {
+                    console.log('Sales data loaded successfully');
+                    const data = snapshot.val() || { total: 0, recent: [] };
+                    updateAnalytics(data);
+                })
+                .catch(error => {
+                    console.error('Error loading sales data:', error);
+                    // Show empty state
+                    updateAnalytics({ total: 0, recent: [] });
+                });
+        }
+
+        // Initialize analytics when switching to the tab
+        function initializeAnalytics() {
+            console.log('Initializing analytics...');
+            
+            // Clean up existing charts
+            if (analyticsCharts.weeklyChart) {
+                analyticsCharts.weeklyChart.destroy();
+                analyticsCharts.weeklyChart = null;
+            }
+            if (analyticsCharts.predictionsChart) {
+                analyticsCharts.predictionsChart.destroy();
+                analyticsCharts.predictionsChart = null;
+            }
+
+            // Initialize new charts
+            const weeklyCtx = document.getElementById('weeklyChart');
+            const predictionsCtx = document.getElementById('predictionsChart');
+
+            if (!weeklyCtx || !predictionsCtx) {
+                console.error('Could not find chart canvases');
+                return;
+            }
+
+            // Create Weekly Chart
+            analyticsCharts.weeklyChart = new Chart(weeklyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Weekly Sales',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + value
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Create Predictions Chart
+            analyticsCharts.predictionsChart = new Chart(predictionsCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Historical Sales',
+                        data: [],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Predictions',
+                        data: [],
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        borderDash: [5, 5],
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + value
+                            }
+                        }
+                    }
+                }
+            });
+
+            console.log('Charts created, initializing Firebase...');
+            initializeFirebase();
+        }
+
+        // Call this when switching tabs
         function switchTab(tabId) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
-            // Show selected tab
-            document.getElementById(tabId).classList.add('active');
-            
-            // Update navigation highlighting
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            document.querySelector(`[href="#${tabId}"]`).classList.add('active');
-        }
-
-        // Reminder handling
-        let activeReminders = [];
-
-        function handleReminderSubmit(event) {
-            event.preventDefault();
             
-            const reminder = {
-                id: Date.now(),
-                title: document.getElementById('reminderTitle').value,
-                goal: document.getElementById('reminderGoal').value,
-                time: document.getElementById('reminderTime').value
-            };
+            const selectedTab = document.getElementById(tabId);
+            const selectedNav = document.querySelector(`[href="#${tabId}"]`);
             
-            activeReminders.push(reminder);
-            saveReminders();
-            updateRemindersList();
-            
-            // Schedule notification
-            scheduleReminder(reminder);
-            
-            // Clear form
-            event.target.reset();
-            
-            // Show confirmation
-            showNotification('Reminder set successfully!');
-        }
-
-        function showReminderNow() {
-            const title = document.getElementById('reminderTitle').value;
-            const goal = document.getElementById('reminderGoal').value;
-            
-            if (!title || !goal) {
-                showNotification('Please fill in the reminder details first!', 'error');
-                return;
-            }
-            
-            showNotification(`Reminder: ${title} - Goal: $${goal}`);
-        }
-
-        function showNotification(message, type = 'success') {
-            const notificationsList = document.getElementById('notificationsList');
-            
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <div class="notification-content">${message}</div>
-                <button class="notification-close" onclick="this.parentElement.remove()">✕</button>
-            `;
-            
-            // Add to notifications list
-            notificationsList.appendChild(notification);
-        }
-
-        function scheduleReminder(reminder) {
-            const timeUntilReminder = new Date(reminder.time) - new Date();
-            if (timeUntilReminder > 0) {
-                setTimeout(() => {
-                    showNotification(`Reminder: ${reminder.title} - Goal: $${reminder.goal}`);
-                }, timeUntilReminder);
-            }
-        }
-
-        function updateRemindersList() {
-            const remindersList = document.getElementById('remindersList');
-            remindersList.innerHTML = activeReminders
-                .map(reminder => `
-                    <div class="reminder-item">
-                        <div>
-                            <strong>${reminder.title}</strong>
-                            <div>Goal: $${reminder.goal}</div>
-                            <div>Time: ${new Date(reminder.time).toLocaleString()}</div>
-                        </div>
-                        <button class="reminder-button" onclick="deleteReminder(${reminder.id})">Delete</button>
-                    </div>
-                `).join('');
-        }
-
-        function deleteReminder(id) {
-            activeReminders = activeReminders.filter(r => r.id !== id);
-            saveReminders();
-            updateRemindersList();
-        }
-
-        function saveReminders() {
-            localStorage.setItem('reminders', JSON.stringify(activeReminders));
-        }
-
-        function loadReminders() {
-            const saved = localStorage.getItem('reminders');
-            if (saved) {
-                activeReminders = JSON.parse(saved);
-                updateRemindersList();
-                // Reschedule active reminders
-                activeReminders.forEach(scheduleReminder);
-            }
-        }
-
-        // Load reminders when page loads
-        window.addEventListener('load', loadReminders);
-
-        function setUnknownCustomer() {
-            document.getElementById('customerName').value = 'Unknown Customer';
-        }
-
-        function showSuccessAnimation(customer, amount, date) {
-            console.log('Showing success animation...'); // Debug log
-            
-            const overlay = document.querySelector('.success-overlay');
-            const popup = document.querySelector('.success-popup');
-            const details = document.querySelector('.sale-details');
-            
-            if (!overlay || !popup || !details) {
-                console.error('Required elements not found!');
-                return;
-            }
-            
-            console.log('Elements found, setting up animation...'); // Debug log
-            
-            // Set content
-            details.textContent = `${customer} - $${amount}`;
-            
-            // Show overlay first
-            overlay.style.display = 'flex';
-            
-            // Force reflow
-            void overlay.offsetWidth;
-            
-            // Add visible class
-            overlay.classList.add('visible');
-            
-            // Add show class to popup after a brief delay
-            setTimeout(() => {
-                popup.classList.add('show');
-                console.log('Animation classes added'); // Debug log
-            }, 10);
-            
-            // Setup click to dismiss
-            const hideOverlay = () => {
-                console.log('Hiding overlay...'); // Debug log
-                popup.classList.remove('show');
-                overlay.classList.remove('visible');
+            if (selectedTab && selectedNav) {
+                selectedTab.classList.add('active');
+                selectedNav.classList.add('active');
                 
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 300);
-                
-                overlay.removeEventListener('click', hideOverlay);
-            };
-            
-            overlay.addEventListener('click', hideOverlay);
-        }
-
-        // Achievement tracking
-        let achievements = {
-            firstSale: false,
-            sales100: 0,
-            streak: 0,
-            lastSaleDate: null
-        };
-
-        // Load saved achievements
-        function loadAchievements() {
-            const savedAchievements = localStorage.getItem('achievements');
-            if (savedAchievements) {
-                achievements = JSON.parse(savedAchievements);
-                updateAchievementDisplay();
-            }
-        }
-
-        // Save achievements
-        function saveAchievements() {
-            localStorage.setItem('achievements', JSON.stringify(achievements));
-        }
-
-        // Update achievement display
-        function updateAchievementDisplay() {
-            // First Sale
-            document.getElementById('firstSaleProgress').textContent = 
-                achievements.firstSale ? 'Completed! 🎉' : 'Not Started';
-
-            // $100 in Sales
-            document.getElementById('sales100Progress').textContent = 
-                achievements.sales100 >= 100 ? 'Completed! 🎉' : `$${achievements.sales100}/100`;
-
-            // Streak
-            document.getElementById('streakProgress').textContent = 
-                `${achievements.streak}/7 days`;
-        }
-
-        // Update achievements when sale is made
-        function updateAchievements(saleAmount) {
-            // First Sale
-            if (!achievements.firstSale) {
-                achievements.firstSale = true;
-                showNotification('Achievement Unlocked: First Sale! 🌟');
-            }
-
-            // $100 in Sales
-            achievements.sales100 += saleAmount;
-            if (achievements.sales100 >= 100 && achievements.sales100 - saleAmount < 100) {
-                showNotification('Achievement Unlocked: $100 in Sales! 💎');
-            }
-
-            // Update streak
-            const today = new Date().toDateString();
-            if (achievements.lastSaleDate !== today) {
-                achievements.streak++;
-                achievements.lastSaleDate = today;
-                
-                if (achievements.streak === 7) {
-                    showNotification('Achievement Unlocked: 7-Day Streak! 🏆');
+                if (tabId === 'analytics') {
+                    setTimeout(initializeAnalytics, 100);
                 }
             }
-
-            // Update display and save
-            updateAchievementDisplay();
-            saveAchievements();
         }
 
-        // Prevent bounce effect on iOS
-        document.body.addEventListener('touchmove', function(e) {
-            if (e.target.closest('.tab-content')) return;
-            e.preventDefault();
-        }, { passive: false });
+        // Add Firebase listener for real-time updates
+        database.ref('sales').on('value', (snapshot) => {
+            const data = snapshot.val() || { total: 0, recent: [] };
+            updateAnalytics(data);
+        });
 
-        // Fix for mobile viewport height
-        function fixMobileHeight() {
-            let vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        // Initialize Firebase connection when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeFirebase();
+        });
+
+        function calculatePredictions(sales) {
+            try {
+                // Process historical data
+                const dailyTotals = {};
+                sales.forEach(sale => {
+                    try {
+                        // Convert Firebase timestamp or date string to Date object
+                        let date;
+                        if (typeof sale.date === 'string') {
+                            // Parse date string
+                            date = new Date(sale.date.replace(' at ', ' '));
+                        } else if (sale.date && sale.date.seconds) {
+                            // Handle Firebase timestamp
+                            date = new Date(sale.date.seconds * 1000);
+                        } else {
+                            // Handle numeric timestamp
+                            date = new Date(sale.date);
+                        }
+
+                        if (isNaN(date.getTime())) {
+                            console.warn('Invalid date found:', sale.date);
+                            return; // Skip invalid dates
+                        }
+                        
+                        const dateKey = date.toISOString().split('T')[0];
+                        dailyTotals[dateKey] = (dailyTotals[dateKey] || 0) + sale.amount;
+                    } catch (err) {
+                        console.warn('Error processing sale:', err);
+                    }
+                });
+
+                // Calculate average daily growth
+                const sortedDates = Object.keys(dailyTotals).sort();
+                let growthRates = [];
+                
+                for (let i = 1; i < sortedDates.length; i++) {
+                    const yesterday = dailyTotals[sortedDates[i-1]];
+                    const today = dailyTotals[sortedDates[i]];
+                    if (yesterday > 0) {
+                        growthRates.push((today - yesterday) / yesterday);
+                    }
+                }
+
+                // Calculate averages
+                const avgGrowthRate = growthRates.length > 0 
+                    ? growthRates.reduce((a, b) => a + b, 0) / growthRates.length 
+                    : 0;
+
+                const avgDailySales = sortedDates.length > 0
+                    ? Object.values(dailyTotals).reduce((a, b) => a + b, 0) / sortedDates.length
+                    : 0;
+
+                // Generate predictions for next 7 days
+                const predictions = [];
+                const labels = [];
+                let predictedValue = avgDailySales;
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() + i);
+                    
+                    const dateStr = date.toLocaleDateString('en-US', { 
+                        weekday: 'short', 
+                        month: 'short', 
+                        day: 'numeric'
+                    });
+                    
+                    labels.push(dateStr);
+                    predictions.push(predictedValue);
+                    predictedValue *= (1 + avgGrowthRate);
+                }
+
+                // Update predictions chart
+                if (analyticsCharts.predictionsChart) {
+                    analyticsCharts.predictionsChart.data.labels = labels;
+                    analyticsCharts.predictionsChart.data.datasets[1].data = predictions;
+                    
+                    const historicalData = labels.map(() => avgDailySales);
+                    analyticsCharts.predictionsChart.data.datasets[0].data = historicalData;
+                    
+                    analyticsCharts.predictionsChart.update();
+
+                    // Update prediction summary
+                    const totalPredicted = predictions.reduce((a, b) => a + b, 0);
+                    document.getElementById('predictedSales').textContent = 
+                        `$${totalPredicted.toFixed(2)}`;
+                    document.getElementById('predictedGrowth').textContent = 
+                        `${(avgGrowthRate * 100).toFixed(1)}%`;
+                }
+            } catch (error) {
+                console.error('Error in predictions calculation:', error);
+                // Set default values if calculation fails
+                if (analyticsCharts.predictionsChart) {
+                    analyticsCharts.predictionsChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    analyticsCharts.predictionsChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
+                    analyticsCharts.predictionsChart.data.datasets[1].data = [0, 0, 0, 0, 0, 0, 0];
+                    analyticsCharts.predictionsChart.update();
+                }
+                document.getElementById('predictedSales').textContent = '$0.00';
+                document.getElementById('predictedGrowth').textContent = '0%';
+            }
         }
 
-        window.addEventListener('resize', fixMobileHeight);
-        window.addEventListener('orientationchange', fixMobileHeight);
-        fixMobileHeight();
-
-        // Admin Functions
+        // Add showAdminPrompt function
         function showAdminPrompt() {
-            document.getElementById('adminModal').style.display = 'flex';
-            document.getElementById('adminPassword').value = ''; // Clear password field
+            const password = prompt("Enter admin password:");
+            if (password === "entropy123") { // Changed password
+                // Show admin panel
+                const adminPanel = document.getElementById('adminPanel');
+                if (adminPanel) {
+                    adminPanel.style.display = 'block';
+                }
+                console.log("Admin access granted");
+            } else {
+                alert("Incorrect password");
+            }
         }
 
-        function closeAdminModal() {
-            document.getElementById('adminModal').style.display = 'none';
+        // Add updateAnalytics function
+        function updateAnalytics(data) {
+            const sales = Array.isArray(data.recent) ? data.recent : [];
+            const total = data.total || 0;
+            
+            // Update total sales
+            document.getElementById('totalSales').textContent = `$${total.toFixed(2)}`;
+            
+            // Process sales data for weekly chart
+            const dailyTotals = new Array(7).fill(0);
+            const dailySales = {};
+            let highestDay = { amount: 0, date: '-' };
+            
+            sales.forEach(sale => {
+                try {
+                    // Parse date
+                    const date = new Date(sale.date.replace(' at ', ' '));
+                    if (!isNaN(date.getTime())) {
+                        const dayIndex = date.getDay();
+                        const dateStr = date.toLocaleDateString();
+                        
+                        // Update daily totals
+                        dailyTotals[dayIndex] += sale.amount;
+                        
+                        // Track highest day
+                        dailySales[dateStr] = (dailySales[dateStr] || 0) + sale.amount;
+                        if (dailySales[dateStr] > highestDay.amount) {
+                            highestDay = {
+                                amount: dailySales[dateStr],
+                                date: dateStr
+                            };
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Error processing sale:', err);
+                }
+            });
+            
+            // Update highest day display
+            document.getElementById('highestDay').textContent = `$${highestDay.amount.toFixed(2)}`;
+            document.getElementById('highestDayDate').textContent = highestDay.date;
+            
+            // Update weekly chart
+            if (analyticsCharts.weeklyChart) {
+                analyticsCharts.weeklyChart.data.datasets[0].data = dailyTotals;
+                analyticsCharts.weeklyChart.update();
+            }
+            
+            // Calculate and update predictions
+            calculatePredictions(sales);
         }
+
+        // Add success/error animation functions
+        function showSuccessAnimation(message) {
+            // You can customize this animation
+            alert(message || 'Success!');
+        }
+
+        function showErrorAnimation(message) {
+            // You can customize this animation
+            alert(message || 'Error occurred');
+        }
+
+        // Add Firebase listener for previous sales
+        database.ref('sales/recent').on('value', (snapshot) => {
+            const salesData = snapshot.val() || {};
+            const salesList = document.getElementById('recentSalesList');
+            if (salesList) {
+                salesList.innerHTML = ''; // Clear existing list
+                
+                // Convert to array and sort by timestamp
+                const sales = Object.entries(salesData)
+                    .map(([key, sale]) => ({...sale, key}))
+                    .sort((a, b) => b.timestamp - a.timestamp);
+
+                // Display recent sales
+                sales.forEach(sale => {
+                    const li = document.createElement('li');
+                    li.className = 'sale-item';
+                    li.innerHTML = `
+                        <span class="sale-amount">$${sale.amount.toFixed(2)}</span>
+                        <span class="sale-date">${sale.date}</span>
+                    `;
+                    salesList.appendChild(li);
+                });
+            }
+        });
     </script>
 </body>
 </html>
+
 
 
 
